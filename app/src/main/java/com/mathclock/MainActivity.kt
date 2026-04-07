@@ -88,20 +88,15 @@ private fun timeInWords(date: Date): String {
     val cal = Calendar.getInstance().apply { time = date }
     val hour = cal.get(Calendar.HOUR) // 0-11
     val displayHour = if (hour == 0) 12 else hour
+    val nextHour = if (displayHour == 12) 1 else displayHour + 1
     val minute = cal.get(Calendar.MINUTE)
 
     return when {
-        minute == 0 -> "It is $displayHour o'clock"
-        minute == 1 -> "It is one minute after $displayHour"
-        minute <= 30 -> "It is $minute minutes after $displayHour"
-        minute == 59 -> {
-            val nextHour = if (displayHour == 12) 1 else displayHour + 1
-            "It is one minute to $nextHour"
-        }
-        else -> {
-            val nextHour = if (displayHour == 12) 1 else displayHour + 1
-            "It is ${60 - minute} minutes to $nextHour"
-        }
+        minute == 0 -> "Es ist $displayHour Uhr"
+        minute == 1 -> "Es ist eine Minute nach $displayHour"
+        minute <= 30 -> "Es ist $minute Minuten nach $displayHour"
+        minute == 59 -> "Es ist eine Minute vor $nextHour"
+        else -> "Es ist ${60 - minute} Minuten vor $nextHour"
     }
 }
 
