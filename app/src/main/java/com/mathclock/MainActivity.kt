@@ -104,7 +104,7 @@ private fun timeInWords(date: Date): String {
     else {
         val min = if ((offset == 1) or ((granularity - offset) == 1)) "Minute" else "Minuten"
         return if (offset < (granularity / 2.0))
-            "$retVal $offset $min nach ${fractionInText(fraction)} $nextHour"
+            "$retVal $offset $min nach ${fractionInText(fraction)} ${if (fraction == 0) displayHour else nextHour}"
         else
             "$retVal ${granularity - offset} $min vor ${fractionInText(fraction + 1)} $nextHour"
     }
