@@ -91,14 +91,34 @@ private fun timeInWords(date: Date): String {
     val nextHour = if (displayHour == 12) 1 else displayHour + 1
     val minute = cal.get(Calendar.MINUTE)
 
-    return when {
-        minute == 0 -> "Es ist $displayHour Uhr"
-        minute == 1 -> "Es ist eine Minute nach $displayHour"
-        minute <= 30 -> "Es ist $minute Minuten nach $displayHour"
-        minute == 59 -> "Es ist eine Minute vor $nextHour"
-        else -> "Es ist ${60 - minute} Minuten vor $nextHour"
+    val granularity = 15
+    val fraction = minute / granularity
+    val offset = minute % granularity
+
+    val retVal = "Es ist"
+    if (offset == 0)
+        return if (fraction == 0)
+            "$retVal $displayHour Uhr"
+        else
+            "$retVal ${fractionInText(fraction)} $nextHour"
+    else {
+        val min = if ((offset == 1) or ((granularity - offset) == 1)) "Minute" else "Minuten"
+        return if (offset < (granularity / 2.0))
+            "$retVal $offset $min nach ${fractionInText(fraction)} $nextHour"
+        else
+            "$retVal ${granularity - offset} $min vor ${fractionInText(fraction + 1)} $nextHour"
     }
 }
+
+private fun fractionInText(fraction: Int): String {
+    return when (fraction) {
+        1 -> "Viertel"
+        2 -> "Halb"
+        3 -> "Drei Viertel"
+        else -> ""
+    }
+}
+
 
 @Preview(showBackground = true)
 @Composable
