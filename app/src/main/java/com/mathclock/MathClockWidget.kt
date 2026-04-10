@@ -22,9 +22,6 @@ import androidx.glance.layout.Column
 import androidx.glance.layout.fillMaxSize
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
-import androidx.glance.unit.ColorProvider
-import androidx.glance.background
-import androidx.glance.layout.Box
 import androidx.glance.appwidget.updateAll
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -32,6 +29,10 @@ import androidx.glance.layout.Spacer
 import androidx.glance.layout.height
 import java.util.Calendar
 import java.util.Date
+import androidx.glance.background
+import androidx.glance.layout.Box
+import androidx.glance.unit.ColorProvider
+import androidx.glance.GlanceTheme
 
 class MathClockWidget : GlanceAppWidget() {
 
@@ -48,7 +49,7 @@ class MathClockWidget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(ColorProvider(R.color.black))
+                .background(GlanceTheme.colors.background)
                 .clickable(actionStartActivity<MainActivity>()),
             contentAlignment = Alignment.Center
         ) {
@@ -66,7 +67,7 @@ class MathClockWidget : GlanceAppWidget() {
                     text = timeInWords(now),
                     style = TextStyle(
                         fontSize = 16.sp,
-                        color = ColorProvider(R.color.white)
+                        color = GlanceTheme.colors.onSurface
                     )
                 )
             }
