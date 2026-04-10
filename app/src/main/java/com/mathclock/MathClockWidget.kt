@@ -31,7 +31,6 @@ import java.util.Calendar
 import java.util.Date
 import androidx.glance.background
 import androidx.glance.layout.Box
-import androidx.glance.unit.ColorProvider
 import androidx.glance.GlanceTheme
 
 class MathClockWidget : GlanceAppWidget() {
