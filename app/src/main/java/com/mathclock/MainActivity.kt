@@ -26,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.mathclock.ui.theme.MathClockTheme
 import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
-import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -82,41 +81,6 @@ fun DigitalClock(modifier: Modifier = Modifier) {
 private fun formatTime(date: Date): String {
     val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
     return sdf.format(date)
-}
-
-private fun timeInWords(date: Date): String {
-    val cal = Calendar.getInstance().apply { time = date }
-    val hour = cal.get(Calendar.HOUR) // 0-11
-    val displayHour = if (hour == 0) 12 else hour
-    val nextHour = if (displayHour == 12) 1 else displayHour + 1
-    val minute = cal.get(Calendar.MINUTE)
-
-    val granularity = 15
-    val fraction = minute / granularity
-    val offset = minute % granularity
-
-    val retVal = "Es ist"
-    if (offset == 0)
-        return if (fraction == 0)
-            "$retVal $displayHour Uhr"
-        else
-            "$retVal ${fractionInText(fraction)} $nextHour"
-    else {
-        val min = if ((offset == 1) or ((granularity - offset) == 1)) "Minute" else "Minuten"
-        return if (offset < (granularity / 2.0))
-            "$retVal $offset $min nach ${fractionInText(fraction)} ${if (fraction == 0) displayHour else nextHour}"
-        else
-            "$retVal ${granularity - offset} $min vor ${fractionInText(fraction + 1)} $nextHour"
-    }
-}
-
-private fun fractionInText(fraction: Int): String {
-    return when (fraction) {
-        1 -> "Viertel"
-        2 -> "Halb"
-        3 -> "Drei Viertel"
-        else -> ""
-    }
 }
 
 
