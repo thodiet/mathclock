@@ -30,22 +30,24 @@ import androidx.glance.layout.height
 import java.util.Date
 import androidx.glance.background
 import androidx.glance.layout.Box
-import androidx.glance.material3.ColorProviders
 import androidx.glance.GlanceTheme
 
 class MathClockWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        val now = Date()
+        Log.d("MathClockWidget", "provideGlance started at $now")
         provideContent {
             GlanceTheme {
-                WidgetContent(context)
+                WidgetContent(context, now)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context) {
-        val now = Date()
+    private fun WidgetContent(context: Context, now: Date) {
+        val wordTime = timeInWords(now)
+        Log.d("MathClockWidget", "WidgetContent rendering at $now with text: $wordTime")
 
         Box(
             modifier = GlanceModifier
@@ -78,21 +80,42 @@ class MathClockWidget : GlanceAppWidget() {
 
 class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = MathClockWidget()
-    private val scope = MainScope()
 
     companion object {
         private const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        super.onReceive(context, intent)
-        if (intent.action == ACTION_UPDATE || intent.action == Intent.ACTION_TIME_TICK || 
-            intent.action == Intent.ACTION_TIME_CHANGED || intent.action == Intent.ACTION_TIMEZONE_CHANGED) {
-            
-            scope.launch {
-                MathClockWidget().updateAll(context)
+        Log.d("MathClockWidget", "onReceive: ${intent.action}")
+        
+        when (intent.action) {
+            ACTION_UPDATE -> {
+                val pendingResult = goAsync()
+                MainScope().launch {
+                    try {
+                        Log.d("MathClockWidget", "Manually triggering updateAll for ACTION_UPDATE")
+                        glanceAppWidget.updateAll(context)
+                    } catch (e: Exception) {
+                        Log.e("MathClockWidget", "Failed to update widget", e)
+                    } finally {
+                        pendingResult?.finish()
+                    }
+                }
+                scheduleUpdate(context)
             }
-            scheduleUpdate(context)
+            Intent.ACTION_TIME_TICK, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED -> {
+                MainScope().launch {
+                    glanceAppWidget.updateAll(context)
+                }
+                scheduleUpdate(context)
+            }
+            "android.appwidget.action.APPWIDGET_UPDATE" -> {
+                super.onReceive(context, intent)
+                scheduleUpdate(context)
+            }
+            else -> {
+                super.onReceive(context, intent)
+            }
         }
     }
 
