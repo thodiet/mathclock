@@ -30,13 +30,16 @@ import androidx.glance.layout.height
 import java.util.Date
 import androidx.glance.background
 import androidx.glance.layout.Box
+import androidx.glance.material3.ColorProviders
 import androidx.glance.GlanceTheme
 
 class MathClockWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
         provideContent {
-            WidgetContent(context)
+            GlanceTheme {
+                WidgetContent(context)
+            }
         }
     }
 
@@ -54,7 +57,7 @@ class MathClockWidget : GlanceAppWidget() {
             Column(
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
-                // System-managed TextClock for smooth seconds
+                // System-managed TextClock (Uses ?android:attr/textColorPrimary in XML)
                 AndroidRemoteViews(
                     remoteViews = RemoteViews(context.packageName, R.layout.widget_clock_layout)
                 )
