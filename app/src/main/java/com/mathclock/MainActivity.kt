@@ -13,6 +13,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,24 +37,77 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+enum class Screen {
+    Clock, Help
+}
+
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MathClockTheme {
-                Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
+                var currentScreen by remember { mutableStateOf(Screen.Clock) }
+
+                Scaffold(
+                    modifier = Modifier.fillMaxSize(),
+                    topBar = {
+                        TopAppBar(
+                            title = { Text(if (currentScreen == Screen.Clock) "Math Clock" else "Hilfe") },
+                            navigationIcon = {
+                                if (currentScreen == Screen.Help) {
+                                    IconButton(onClick = { currentScreen = Screen.Clock }) {
+                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
+                                    }
+                                }
+                            },
+                            actions = {
+                                if (currentScreen == Screen.Clock) {
+                                    IconButton(onClick = { currentScreen = Screen.Help }) {
+                                        Icon(Icons.AutoMirrored.Filled.Help, contentDescription = "Hilfe")
+                                    }
+                                }
+                            }
+                        )
+                    }
+                ) { innerPadding ->
                     Box(
                         modifier = Modifier
                             .fillMaxSize()
                             .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
-                        DigitalClock()
+                        when (currentScreen) {
+                            Screen.Clock -> DigitalClock()
+                            Screen.Help -> HelpScreen()
+                        }
                     }
                 }
             }
         }
+    }
+}
+
+@Composable
+fun HelpScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = "Anleitung zur Math Clock",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Hier wird bald der Hilfe-Text stehen.\n\n" +
+                   "Die Math Clock zeigt die Zeit nicht nur in Zahlen, sondern auch in Worten an, " +
+                   "basierend auf mathematischen Vierteln einer Stunde.",
+            style = MaterialTheme.typography.bodyLarge
+        )
     }
 }
 
