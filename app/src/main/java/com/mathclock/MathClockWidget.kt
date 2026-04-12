@@ -31,6 +31,7 @@ import java.util.Date
 import androidx.glance.background
 import androidx.glance.layout.Box
 import androidx.glance.GlanceTheme
+import androidx.glance.layout.fillMaxWidth
 
 class MathClockWidget : GlanceAppWidget() {
 
@@ -61,7 +62,10 @@ class MathClockWidget : GlanceAppWidget() {
             ) {
                 // System-managed TextClock (Uses ?android:attr/textColorPrimary in XML)
                 AndroidRemoteViews(
-                    remoteViews = RemoteViews(context.packageName, R.layout.widget_clock_layout)
+                    remoteViews = RemoteViews(context.packageName, R.layout.widget_clock_layout),
+                    modifier = GlanceModifier
+                        .fillMaxWidth()
+                        .height(30.dp)
                 )
                 
                 Spacer(modifier = GlanceModifier.height(8.dp))

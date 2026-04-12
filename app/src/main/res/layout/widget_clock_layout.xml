@@ -7,7 +7,7 @@
 
     <TextClock
         android:id="@+id/widget_text_clock"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
         android:format12Hour="hh:mm:ss"
