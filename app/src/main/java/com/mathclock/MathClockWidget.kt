@@ -104,8 +104,15 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
                 scheduleUpdate(context)
             }
             Intent.ACTION_TIME_TICK, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED -> {
+                val pendingResult = goAsync()
                 MainScope().launch {
-                    glanceAppWidget.updateAll(context)
+                    try {
+                        glanceAppWidget.updateAll(context)
+                    } catch (e: Exception) {
+                        Log.e("MathClockWidget", "Failed to update widget on time event", e)
+                    } finally {
+                        pendingResult?.finish()
+                    }
                 }
                 scheduleUpdate(context)
             }
