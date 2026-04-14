@@ -1,22 +1,21 @@
 # Jetpack Compose Glance Rules
--keep class androidx.glance.appwidget.** { *; }
+-keep class androidx.glance.appwidget.GlanceAppWidgetReceiver { *; }
+-keep class androidx.glance.appwidget.GlanceAppWidget { *; }
 -keep class com.mathclock.MathClockWidgetReceiver { *; }
 -keep class com.mathclock.MathClockWidget { *; }
--keep class androidx.glance.** { *; }
 
-# WorkManager (essential for Glance background updates)
--keep class androidx.work.** { *; }
+# WorkManager (more specific rules to avoid "Overly broad" warnings)
 -keep class * extends androidx.work.ListenableWorker { public <init>(...); }
 -keep class * extends androidx.work.InputMerger { public <init>(...); }
-
-# Room (used by WorkManager)
 -keep class androidx.work.impl.WorkDatabase_Impl { *; }
--keep class androidx.work.impl.background.** { *; }
--keep class * extends androidx.room.RoomDatabase
 -dontwarn androidx.work.impl.**
 
+# Room (used by WorkManager)
+-keep class * extends androidx.room.RoomDatabase
+-keep class androidx.room.Room { *; }
+
 # App Startup
--keep class androidx.startup.** { *; }
+-keep class androidx.startup.InitializationProvider { *; }
 
 # UI Components & Resources
 -keep class android.widget.RemoteViews { *; }
@@ -24,14 +23,16 @@
 -keep class com.mathclock.R$layout { *; }
 -keep class com.mathclock.R$id { *; }
 
-# System requirements
+# System requirements for Glance
 -keep public class * extends androidx.glance.appwidget.GlanceAppWidgetReceiver
 -keep public class * extends androidx.glance.appwidget.GlanceAppWidget
 
-# Compose & Lifecycle
--keep class androidx.compose.runtime.** { *; }
+# Compose Runtime
+-keep class androidx.compose.runtime.ParcelableSnapshotState* { *; }
 -keep @interface androidx.compose.runtime.Composable
--keep class androidx.lifecycle.ProcessLifecycleOwnerInitializer { *; }
+
+# Lifecycle
+-keep class androidx.lifecycle.**Initializer { *; }
 
 # Resource Keeping
 -keepclassmembers class **.R$* {
