@@ -1,21 +1,39 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
+# Jetpack Compose Glance Rules
+-keep class androidx.glance.appwidget.** { *; }
+-keep class com.mathclock.MathClockWidgetReceiver { *; }
+-keep class com.mathclock.MathClockWidget { *; }
+-keep class androidx.glance.** { *; }
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# WorkManager (essential for Glance background updates)
+-keep class androidx.work.** { *; }
+-keep class * extends androidx.work.ListenableWorker { public <init>(...); }
+-keep class * extends androidx.work.InputMerger { public <init>(...); }
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Room (used by WorkManager)
+-keep class androidx.work.impl.WorkDatabase_Impl { *; }
+-keep class androidx.work.impl.background.** { *; }
+-keep class * extends androidx.room.RoomDatabase
+-dontwarn androidx.work.impl.**
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# App Startup
+-keep class androidx.startup.** { *; }
+
+# UI Components & Resources
+-keep class android.widget.RemoteViews { *; }
+-keep class android.widget.TextClock { *; }
+-keep class com.mathclock.R$layout { *; }
+-keep class com.mathclock.R$id { *; }
+
+# System requirements
+-keep public class * extends androidx.glance.appwidget.GlanceAppWidgetReceiver
+-keep public class * extends androidx.glance.appwidget.GlanceAppWidget
+
+# Compose & Lifecycle
+-keep class androidx.compose.runtime.** { *; }
+-keep @interface androidx.compose.runtime.Composable
+-keep class androidx.lifecycle.ProcessLifecycleOwnerInitializer { *; }
+
+# Resource Keeping
+-keepclassmembers class **.R$* {
+    public static <fields>;
+}
