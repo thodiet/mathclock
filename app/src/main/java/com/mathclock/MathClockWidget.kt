@@ -93,27 +93,18 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
         Log.d("MathClockWidget", "onReceive: ${intent.action}")
         
         when (intent.action) {
-            ACTION_UPDATE -> {
+            ACTION_UPDATE, 
+            Intent.ACTION_TIME_TICK, 
+            Intent.ACTION_TIME_CHANGED, 
+            Intent.ACTION_TIMEZONE_CHANGED, 
+            Intent.ACTION_USER_PRESENT -> {
                 val pendingResult = goAsync()
                 MainScope().launch {
                     try {
-                        Log.d("MathClockWidget", "Manually triggering updateAll for ACTION_UPDATE")
+                        Log.d("MathClockWidget", "Updating widget for ${intent.action}")
                         glanceAppWidget.updateAll(context)
                     } catch (e: Exception) {
                         Log.e("MathClockWidget", "Failed to update widget", e)
-                    } finally {
-                        pendingResult?.finish()
-                    }
-                }
-                scheduleUpdate(context)
-            }
-            Intent.ACTION_TIME_TICK, Intent.ACTION_TIME_CHANGED, Intent.ACTION_TIMEZONE_CHANGED -> {
-                val pendingResult = goAsync()
-                MainScope().launch {
-                    try {
-                        glanceAppWidget.updateAll(context)
-                    } catch (e: Exception) {
-                        Log.e("MathClockWidget", "Failed to update widget on time event", e)
                     } finally {
                         pendingResult?.finish()
                     }
