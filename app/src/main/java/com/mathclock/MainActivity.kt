@@ -89,39 +89,6 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun HelpScreen() {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.Start
-    ) {
-        Text(
-            text = "Willkommen zur Math Clock",
-            style = MaterialTheme.typography.headlineMedium
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = "Jesus Christus spricht:\n" +
-                    "Ich bin der Weg und die Wahrheit und das Leben; " +
-                    "niemand kommt zum Vater denn durch mich.\n" +
-                    "Joh. 14,6\n\n" +
-                    "David betet:\n" +
-                    "Meine Zeit steht in deinen Händen.\n" +
-                    "Ps. 31,16\n\n" +
-                    "Vor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben " +
-                    "und Drei Viertel sieben und meint damit 6:15 bzw. 6:45.\n" +
-                    "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
-                    "habe ich diese App entwickelt.\n" +
-                    "Mittels eines Widgets kann man sich die Anzeige " +
-                    "auch auf den Startbildschirm legen.\n\n" +
-                    "Alle Ehre dem Herrn Jesus Christus!",
-            style = MaterialTheme.typography.bodyLarge
-        )
-    }
-}
-
-@Composable
 fun DigitalClock(modifier: Modifier = Modifier) {
     var currentDate by remember { mutableStateOf(Date()) }
 
@@ -152,6 +119,39 @@ fun DigitalClock(modifier: Modifier = Modifier) {
 private fun formatTime(date: Date): String {
     val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
     return sdf.format(date)
+}
+
+@Composable
+fun HelpScreen() {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
+        horizontalAlignment = Alignment.Start
+    ) {
+        Text(
+            text = "Willkommen zur Math Clock",
+            style = MaterialTheme.typography.headlineMedium
+        )
+        Spacer(modifier = Modifier.height(16.dp))
+        Text(
+            text = "Jesus Christus spricht:\n" +
+                    "Ich bin der Weg und die Wahrheit und das Leben; " +
+                    "niemand kommt zum Vater denn durch mich.\n" +
+                    "Joh. 14,6\n\n" +
+                    "David betet:\n" +
+                    "Meine Zeit steht in deinen Händen.\n" +
+                    "Ps. 31,16\n\n" +
+                    "Vor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben " +
+                    "und Drei Viertel sieben und meint damit 6:15 bzw. 6:45.\n" +
+                    "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
+                    "habe ich diese App entwickelt.\n" +
+                    "Mittels eines Widgets kann man sich die Anzeige " +
+                    "auch auf den Startbildschirm legen.\n\n" +
+                    "Alle Ehre dem Herrn Jesus Christus!",
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
 
 
