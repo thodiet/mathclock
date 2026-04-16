@@ -4,7 +4,7 @@ import java.util.Calendar
 import java.util.Date
 
 /**
- * converts a time into words with fractions of hours
+ * Converts a time into words with fractions of hours.
  */
 fun timeInWords(date: Date): String {
     val cal = Calendar.getInstance().apply { time = date }
@@ -17,19 +17,22 @@ fun timeInWords(date: Date): String {
     val fraction = minute / granularity
     val offset = minute % granularity
 
-    val retVal = "Es ist"
+    val prefix = "Es ist"
     return if (offset == 0) {
-        if (fraction == 0) "$retVal $displayHour Uhr"
-        else "$retVal ${fractionInText(fraction)} $nextHour"
+        if (fraction == 0) "$prefix $displayHour Uhr"
+        else "$prefix ${fractionInText(fraction)} $nextHour"
     } else {
         val minText = if (offset == 1 || (granularity - offset) == 1) "Minute" else "Minuten"
         if (offset < (granularity / 2.0))
-            "$retVal $offset $minText nach ${fractionInText(fraction)} ${if (fraction == 0) displayHour else nextHour}"
+            "$prefix $offset $minText nach ${fractionInText(fraction)} ${if (fraction == 0) displayHour else nextHour}"
         else
-            "$retVal ${granularity - offset} $minText vor ${fractionInText(fraction + 1)} $nextHour"
+            "$prefix ${granularity - offset} $minText vor ${fractionInText(fraction + 1)} $nextHour"
     }
 }
 
+/**
+ * Returns the textual representation of a fraction.
+ */
 private fun fractionInText(fraction: Int): String {
     return when (fraction) {
         1 -> "Viertel"

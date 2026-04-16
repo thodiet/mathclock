@@ -14,7 +14,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.Help
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -37,7 +37,7 @@ import java.util.Date
 import java.util.Locale
 
 enum class Screen {
-    Clock, Help
+    Clock, Info
 }
 
 class MainActivity : ComponentActivity() {
@@ -53,9 +53,9 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
                         TopAppBar(
-                            title = { Text(if (currentScreen == Screen.Clock) "Math Clock" else "Hilfe") },
+                            title = { Text(if (currentScreen == Screen.Clock) "Math Clock" else "Info") },
                             navigationIcon = {
-                                if (currentScreen == Screen.Help) {
+                                if (currentScreen == Screen.Info) {
                                     IconButton(onClick = { currentScreen = Screen.Clock }) {
                                         Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
                                     }
@@ -63,8 +63,8 @@ class MainActivity : ComponentActivity() {
                             },
                             actions = {
                                 if (currentScreen == Screen.Clock) {
-                                    IconButton(onClick = { currentScreen = Screen.Help }) {
-                                        Icon(Icons.AutoMirrored.Filled.Help, contentDescription = "Hilfe")
+                                    IconButton(onClick = { currentScreen = Screen.Info }) {
+                                        Icon(Icons.Default.Info, contentDescription = "Info")
                                     }
                                 }
                             }
@@ -79,7 +79,7 @@ class MainActivity : ComponentActivity() {
                     ) {
                         when (currentScreen) {
                             Screen.Clock -> DigitalClock()
-                            Screen.Help -> HelpScreen()
+                            Screen.Info -> InfoScreen()
                         }
                     }
                 }
@@ -122,7 +122,7 @@ private fun formatTime(date: Date): String {
 }
 
 @Composable
-fun HelpScreen() {
+fun InfoScreen() {
     Column(
         modifier = Modifier
             .fillMaxSize()
