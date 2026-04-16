@@ -5,14 +5,9 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Haupt-Ziffernblatt -->
+    <!-- Solid light green background circle -->
     <path
         android:fillColor="#3DDC84"
         android:pathData="M54,54m-40,0a40,40 0,1 1,80 0a40,40 0,1 1,-80 0" />
-
-    <!-- Der dunklere Quadrant (Highlight oben rechts) -->
-    <path
-        android:fillColor="#32B56C"
-        android:pathData="M54,54 L54,14 A40,40 0,0 1 94,54 Z" />
 
 </vector>

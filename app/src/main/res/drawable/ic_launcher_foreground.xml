@@ -7,7 +7,12 @@
     <!-- Foreground contains ONLY the black elements (Clock hands, markers, border) -->
     <!-- This ensures that when "Themed Icons" is active, ONLY these elements are tinted -->
 
-    <!-- Clock Border (Schwarzer Rand) -->
+    <!-- Shadow Quadrant (Top-Right) -->
+    <path
+        android:fillColor="#33000000"
+        android:pathData="M54,54 L54,14 A40,40 0,0 1 94,54 Z" />
+
+    <!-- Clock Border (black circle) -->
     <path
         android:strokeColor="#000000"
         android:strokeWidth="1.5"
