@@ -23,9 +23,11 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.text.Text
 import androidx.glance.text.TextStyle
 import androidx.glance.appwidget.updateAll
+import androidx.glance.appwidget.SizeMode
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import androidx.glance.layout.Spacer
+import androidx.glance.LocalSize
 import androidx.glance.layout.height
 import java.util.Date
 import androidx.glance.background
@@ -35,20 +37,31 @@ import androidx.glance.layout.fillMaxWidth
 
 class MathClockWidget : GlanceAppWidget() {
 
+    override val sizeMode = SizeMode.Exact
+
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        val now = Date()
-        Log.d("MathClockWidget", "provideGlance started at $now")
+        Log.d("MathClockWidget", "provideGlance started")
         provideContent {
             GlanceTheme {
-                WidgetContent(context, now)
+                WidgetContent(context)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context, now: Date) {
+    private fun WidgetContent(context: Context) {
+        val now = Date()
+        val size = LocalSize.current
         val wordTime = timeInWords(now)
-        Log.d("MathClockWidget", "WidgetContent rendering at $now with text: $wordTime")
+        Log.d("MathClockWidget", "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime")
+
+        // Dynamic font size based on widget width (size.width is in dp)
+        val calculatedFontSize = when {
+            size.width < 150.dp -> 8.sp
+            size.width < 250.dp -> 12.sp
+            size.width < 350.dp -> 16.sp
+            else -> 20.sp
+        }
 
         Box(
             modifier = GlanceModifier
@@ -70,11 +83,12 @@ class MathClockWidget : GlanceAppWidget() {
                 Spacer(modifier = GlanceModifier.height(8.dp))
                 
                 Text(
-                    text = timeInWords(now),
+                    text = wordTime,
                     style = TextStyle(
-                        fontSize = 16.sp,
+                        fontSize = calculatedFontSize,
                         color = GlanceTheme.colors.onSurface
-                    )
+                    ),
+                    maxLines = 1
                 )
             }
         }
