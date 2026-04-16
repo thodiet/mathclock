@@ -147,7 +147,9 @@ fun InfoScreen() {
                     "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
                     "habe ich diese App entwickelt.\n" +
                     "Mittels eines Widgets kann man sich die Anzeige " +
-                    "auch auf den Startbildschirm legen.\n\n" +
+                    "auch auf den Startbildschirm legen.\n" +
+					"Wegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. " +
+					"Das sollte sich nach 1-2 Minuten stabilisieren.\n\n" +
                     "Alle Ehre dem Herrn Jesus Christus!",
             style = MaterialTheme.typography.bodyLarge
         )
