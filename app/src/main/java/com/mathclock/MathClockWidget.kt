@@ -65,7 +65,6 @@ class MathClockWidget : GlanceAppWidget() {
                     remoteViews = RemoteViews(context.packageName, R.layout.widget_clock_layout),
                     modifier = GlanceModifier
                         .fillMaxWidth()
-                        .height(30.dp)
                 )
                 
                 Spacer(modifier = GlanceModifier.height(8.dp))
