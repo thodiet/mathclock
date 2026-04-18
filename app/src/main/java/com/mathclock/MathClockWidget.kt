@@ -34,6 +34,7 @@ import androidx.glance.background
 import androidx.glance.layout.Box
 import androidx.glance.GlanceTheme
 import androidx.glance.layout.fillMaxWidth
+import androidx.compose.ui.graphics.Color
 
 class MathClockWidget : GlanceAppWidget() {
 
@@ -55,6 +56,10 @@ class MathClockWidget : GlanceAppWidget() {
         val wordTime = timeInWords(now)
         Log.d("MathClockWidget", "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime")
 
+        // Adjustable transparency: 0.0 (fully transparent) to 1.0 (fully opaque)
+        val alpha = 1.0f
+        val widgetBackgroundColor = Color.Black.copy(alpha = alpha)
+
         // Dynamic font size based on widget width (size.width is in dp)
         val calculatedFontSize = when {
             size.width < 150.dp -> 8.sp
@@ -66,7 +71,7 @@ class MathClockWidget : GlanceAppWidget() {
         Box(
             modifier = GlanceModifier
                 .fillMaxSize()
-                .background(GlanceTheme.colors.background)
+                .background(widgetBackgroundColor)
                 .clickable(actionStartActivity<MainActivity>()),
             contentAlignment = Alignment.Center
         ) {
