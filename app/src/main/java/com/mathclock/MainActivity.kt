@@ -1,9 +1,11 @@
 package com.mathclock
 
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -19,26 +21,37 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Slider
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.appwidget.updateAll
 import com.mathclock.ui.theme.MathClockTheme
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import androidx.core.content.edit
 
 enum class Screen {
     Clock, Info
 }
+
+const val INITIAL_TRANSPARENCY = 40f // % of transparency, 0 = opaque, 100 = transparent
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -53,11 +66,21 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
                         TopAppBar(
-                            title = { Text(if (currentScreen == Screen.Clock) "Math Clock" else "Info") },
+                            title = {
+                                Text(
+                                    when (currentScreen) {
+                                        Screen.Clock -> "Widget Settings"
+                                        Screen.Info -> "Info"
+                                    }
+                                )
+                            },
                             navigationIcon = {
-                                if (currentScreen == Screen.Info) {
+                                if (currentScreen != Screen.Clock) {
                                     IconButton(onClick = { currentScreen = Screen.Clock }) {
-                                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Zurück")
+                                        Icon(
+                                            Icons.AutoMirrored.Filled.ArrowBack,
+                                            contentDescription = "Zurück"
+                                        )
                                     }
                                 }
                             },
@@ -90,7 +113,17 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun DigitalClock(modifier: Modifier = Modifier) {
+    val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
+    val prefs = remember { current.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE) }
+    var transparency by remember {
+        mutableFloatStateOf(
+            prefs.getFloat(
+                "transparency",
+                INITIAL_TRANSPARENCY
+            )
+        )
+    }
 
     // Update the time every second
     LaunchedEffect(Unit) {
@@ -99,20 +132,46 @@ fun DigitalClock(modifier: Modifier = Modifier) {
             delay(1000L)
         }
     }
-
     Column(
-        modifier = modifier,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = formatTime(currentDate),
-            style = MaterialTheme.typography.displayLarge
+            text = "Hintergrund-Transparenz: $transparency%",
+            style = MaterialTheme.typography.bodyLarge
         )
-        Spacer(modifier = Modifier.height(16.dp))
-        Text(
-            text = timeInWords(currentDate),
-            style = MaterialTheme.typography.headlineSmall
+        Slider(
+            value = transparency,
+            onValueChange = {
+                transparency = it
+            },
+            onValueChangeFinished = {
+                prefs.edit(commit = true) { putFloat("transparency", transparency) }
+                // Trigger widget update using Glance state
+                MainScope().launch {
+                    MathClockWidget.updateTransparency(current.applicationContext, transparency)
+                }
+            },
+            valueRange = 0f..100f
         )
+
+        Column(
+            modifier = Modifier.weight(1f),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Text(
+                text = formatTime(currentDate),
+                style = MaterialTheme.typography.displayLarge
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = timeInWords(currentDate),
+                style = MaterialTheme.typography.headlineSmall
+            )
+        }
     }
 }
 
@@ -148,8 +207,8 @@ fun InfoScreen() {
                     "habe ich diese App entwickelt.\n" +
                     "Mittels eines Widgets kann man sich die Anzeige " +
                     "auch auf den Startbildschirm legen.\n" +
-					"Wegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. " +
-					"Das sollte sich nach 1-2 Minuten stabilisieren.\n\n" +
+                    "Wegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. " +
+                    "Das sollte sich nach 1-2 Minuten stabilisieren.\n\n" +
                     "Alle Ehre dem Herrn Jesus Christus!",
             style = MaterialTheme.typography.bodyLarge
         )

@@ -35,29 +35,70 @@ import androidx.glance.layout.Box
 import androidx.glance.GlanceTheme
 import androidx.glance.layout.fillMaxWidth
 import androidx.compose.ui.graphics.Color
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.floatPreferencesKey
+import androidx.glance.currentState
+import androidx.glance.state.PreferencesGlanceStateDefinition
+
+import androidx.datastore.preferences.core.MutablePreferences
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.appwidget.GlanceAppWidgetManager
 
 class MathClockWidget : GlanceAppWidget() {
 
     override val sizeMode = SizeMode.Exact
+    override val stateDefinition = PreferencesGlanceStateDefinition
+
+    companion object {
+        const val INITIAL_TRANSPARENCY = 40f
+        val TransparencyKey = floatPreferencesKey("transparency")
+        
+        /**
+         * Updates the transparency for all widgets and triggers a redraw.
+         */
+        suspend fun updateTransparency(context: Context, transparency: Float) {
+            val manager = GlanceAppWidgetManager(context)
+            val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
+            glanceIds.forEach { glanceId ->
+                updateAppWidgetState(context, glanceId) { prefs: Preferences ->
+                    prefs.toMutablePreferences().apply {
+                        this[TransparencyKey] = transparency
+                    }
+                }
+            }
+            // Force a refresh of all instances
+            MathClockWidget().updateAll(context)
+        }
+    }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
-        Log.d("MathClockWidget", "provideGlance started")
+        Log.d("MathClockWidget", "provideGlance started for $id")
         provideContent {
+            val glancePrefs = currentState<Preferences>()
+            
+            // Relevante Änderung: Fallback auf SharedPreferences, falls Glance-State noch leer
+            val transparency = glancePrefs[TransparencyKey] ?: run {
+                val sp = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+                sp.getFloat("transparency", INITIAL_TRANSPARENCY)
+            }
+            
+            Log.d("MathClockWidget", "Rendering with transparency: $transparency")
+            
             GlanceTheme {
-                WidgetContent(context)
+                WidgetContent(context, transparency)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context) {
+    private fun WidgetContent(context: Context, transparency: Float) {
         val now = Date()
         val size = LocalSize.current
         val wordTime = timeInWords(now)
         Log.d("MathClockWidget", "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime")
 
-        // Adjustable transparency: 0.0 (fully transparent) to 1.0 (fully opaque)
-        val alpha = 1.0f
+        // Use transparency from state
+        val alpha = (100 - transparency) / 100f
         val widgetBackgroundColor = Color.Black.copy(alpha = alpha)
 
         // Dynamic font size based on widget width (size.width is in dp)
