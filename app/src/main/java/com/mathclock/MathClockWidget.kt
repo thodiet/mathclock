@@ -52,22 +52,39 @@ class MathClockWidget : GlanceAppWidget() {
     companion object {
         const val INITIAL_TRANSPARENCY = 40f
         val TransparencyKey = floatPreferencesKey("transparency")
+        const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
         
         /**
-         * Updates the transparency for all widgets and triggers a redraw.
+         * Updates the transparency for all widgets and triggers an immediate redraw.
          */
         suspend fun updateTransparency(context: Context, transparency: Float) {
+            Log.d("MathClockWidget", "updateTransparency called with: $transparency")
+            
+            // 1. Sync to SharedPreferences first as a reliable backup
+            context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
+                .edit().putFloat("transparency", transparency).apply()
+
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
+            
+            Log.d("MathClockWidget", "Found ${glanceIds.size} widgets to update")
+            
             glanceIds.forEach { glanceId ->
-                updateAppWidgetState(context, glanceId) { prefs: Preferences ->
-                    prefs.toMutablePreferences().apply {
-                        this[TransparencyKey] = transparency
+                try {
+                    updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
+                        prefs.toMutablePreferences().apply {
+                            this[TransparencyKey] = transparency
+                        }
                     }
+                    Log.d("MathClockWidget", "State updated for $glanceId")
+                } catch (e: Exception) {
+                    Log.e("MathClockWidget", "Failed to update state for $glanceId", e)
                 }
             }
-            // Force a refresh of all instances
+            
+            // 2. Immediate update of all widgets
             MathClockWidget().updateAll(context)
+            Log.d("MathClockWidget", "updateAll(context) executed")
         }
     }
 
@@ -144,15 +161,11 @@ class MathClockWidget : GlanceAppWidget() {
 class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = MathClockWidget()
 
-    companion object {
-        private const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
-    }
-
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("MathClockWidget", "onReceive: ${intent.action}")
         
         when (intent.action) {
-            ACTION_UPDATE, 
+            MathClockWidget.ACTION_UPDATE,
             Intent.ACTION_TIME_TICK, 
             Intent.ACTION_TIME_CHANGED, 
             Intent.ACTION_TIMEZONE_CHANGED, 
@@ -188,7 +201,7 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
     private fun scheduleUpdate(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, MathClockWidgetReceiver::class.java).apply {
-            action = ACTION_UPDATE
+            action = MathClockWidget.ACTION_UPDATE
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
@@ -218,7 +231,7 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
     private fun cancelUpdate(context: Context) {
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, MathClockWidgetReceiver::class.java).apply {
-            action = ACTION_UPDATE
+            action = MathClockWidget.ACTION_UPDATE
         }
         val pendingIntent = PendingIntent.getBroadcast(
             context,
