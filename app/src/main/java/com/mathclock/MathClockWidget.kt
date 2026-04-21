@@ -39,8 +39,6 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.glance.currentState
 import androidx.glance.state.PreferencesGlanceStateDefinition
-
-import androidx.datastore.preferences.core.MutablePreferences
 import androidx.glance.appwidget.state.updateAppWidgetState
 import androidx.glance.appwidget.GlanceAppWidgetManager
 
@@ -60,10 +58,6 @@ class MathClockWidget : GlanceAppWidget() {
         suspend fun updateTransparency(context: Context, transparency: Float) {
             Log.d("MathClockWidget", "updateTransparency called with: $transparency")
             
-            // 1. Sync to SharedPreferences first as a reliable backup
-            context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
-                .edit().putFloat("transparency", transparency).apply()
-
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
             
@@ -92,12 +86,7 @@ class MathClockWidget : GlanceAppWidget() {
         Log.d("MathClockWidget", "provideGlance started for $id")
         provideContent {
             val glancePrefs = currentState<Preferences>()
-            
-            // Relevante Änderung: Fallback auf SharedPreferences, falls Glance-State noch leer
-            val transparency = glancePrefs[TransparencyKey] ?: run {
-                val sp = context.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE)
-                sp.getFloat("transparency", INITIAL_TRANSPARENCY)
-            }
+            val transparency = glancePrefs[TransparencyKey] ?: INITIAL_TRANSPARENCY
             
             Log.d("MathClockWidget", "Rendering with transparency: $transparency")
             

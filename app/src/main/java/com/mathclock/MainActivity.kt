@@ -35,9 +35,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.datastore.preferences.core.Preferences
 import androidx.glance.appwidget.GlanceAppWidgetManager
-import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.appwidget.updateAll
+import androidx.glance.appwidget.state.getAppWidgetState
+import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.mathclock.ui.theme.MathClockTheme
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -115,14 +116,23 @@ class MainActivity : ComponentActivity() {
 fun DigitalClock(modifier: Modifier = Modifier) {
     val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
-    val prefs = remember { current.getSharedPreferences("widget_prefs", Context.MODE_PRIVATE) }
+    
+    // Initialer Wert, wird durch LaunchedEffect aktualisiert
     var transparency by remember {
-        mutableFloatStateOf(
-            prefs.getFloat(
-                "transparency",
-                INITIAL_TRANSPARENCY
+        mutableFloatStateOf(MathClockWidget.INITIAL_TRANSPARENCY)
+    }
+
+    // Lade initialen Wert aus Glance-State
+    LaunchedEffect(Unit) {
+        val manager = GlanceAppWidgetManager(current)
+        val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
+        if (glanceIds.isNotEmpty()) {
+            val state = MathClockWidget().getAppWidgetState<Preferences>(
+                current,
+                glanceIds.first()
             )
-        )
+            transparency = state[MathClockWidget.TransparencyKey] ?: MathClockWidget.INITIAL_TRANSPARENCY
+        }
     }
 
     // Update the time every second
@@ -148,8 +158,7 @@ fun DigitalClock(modifier: Modifier = Modifier) {
                 transparency = it
             },
             onValueChangeFinished = {
-                prefs.edit(commit = true) { putFloat("transparency", transparency) }
-                // Trigger widget update using Glance state
+                // Nur noch über Glance speichern
                 MainScope().launch {
                     MathClockWidget.updateTransparency(current.applicationContext, transparency)
                 }
