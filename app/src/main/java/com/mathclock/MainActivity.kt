@@ -1,6 +1,5 @@
 package com.mathclock
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -38,7 +37,6 @@ import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.getAppWidgetState
-import androidx.glance.state.PreferencesGlanceStateDefinition
 import com.mathclock.ui.theme.MathClockTheme
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -46,13 +44,10 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import androidx.core.content.edit
 
 enum class Screen {
     Clock, Info
 }
-
-const val INITIAL_TRANSPARENCY = 40f // % of transparency, 0 = opaque, 100 = transparent
 
 class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -113,7 +108,7 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun DigitalClock(modifier: Modifier = Modifier) {
+fun DigitalClock() {
     val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
     

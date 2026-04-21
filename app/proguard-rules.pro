@@ -4,16 +4,6 @@
 -keep class com.mathclock.MathClockWidgetReceiver { *; }
 -keep class com.mathclock.MathClockWidget { *; }
 
-# WorkManager (more specific rules to avoid "Overly broad" warnings)
--keep class * extends androidx.work.ListenableWorker { public <init>(...); }
--keep class * extends androidx.work.InputMerger { public <init>(...); }
--keep class androidx.work.impl.WorkDatabase_Impl { *; }
--dontwarn androidx.work.impl.**
-
-# Room (used by WorkManager)
--keep class * extends androidx.room.RoomDatabase
--keep class androidx.room.Room { *; }
-
 # App Startup
 -keep class androidx.startup.InitializationProvider { *; }
 
