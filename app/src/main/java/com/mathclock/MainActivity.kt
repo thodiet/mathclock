@@ -112,12 +112,12 @@ fun DigitalClock() {
     val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
     
-    // Initialer Wert, wird durch LaunchedEffect aktualisiert
+    // Initial value, will be updated by LaunchedEffect
     var transparency by remember {
         mutableFloatStateOf(MathClockWidget.INITIAL_TRANSPARENCY)
     }
 
-    // Lade initialen Wert aus Glance-State
+    // Load initial value from Glance state
     LaunchedEffect(Unit) {
         val manager = GlanceAppWidgetManager(current)
         val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
@@ -153,7 +153,6 @@ fun DigitalClock() {
                 transparency = it
             },
             onValueChangeFinished = {
-                // Nur noch über Glance speichern
                 MainScope().launch {
                     MathClockWidget.updateTransparency(current.applicationContext, transparency)
                 }

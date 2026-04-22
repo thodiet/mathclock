@@ -9,6 +9,7 @@ import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.unit.DpSize
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
 import androidx.glance.action.actionStartActivity
@@ -44,28 +45,39 @@ import androidx.glance.appwidget.GlanceAppWidgetManager
 
 class MathClockWidget : GlanceAppWidget() {
 
-    override val sizeMode = SizeMode.Exact
+        override val sizeMode = SizeMode.Responsive(
+        setOf(
+            DpSize(100.dp, 50.dp),
+            DpSize(150.dp, 50.dp),
+            DpSize(250.dp, 50.dp),
+            DpSize(350.dp, 50.dp)
+        )
+    )
     override val stateDefinition = PreferencesGlanceStateDefinition
 
     companion object {
         const val INITIAL_TRANSPARENCY = 40f
         val TransparencyKey = floatPreferencesKey("transparency")
         const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
-        
+
         /**
          * Updates the transparency for all widgets and triggers an immediate redraw.
          */
         suspend fun updateTransparency(context: Context, transparency: Float) {
             Log.d("MathClockWidget", "updateTransparency called with: $transparency")
-            
+
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
-            
+
             Log.d("MathClockWidget", "Found ${glanceIds.size} widgets to update")
-            
+
             glanceIds.forEach { glanceId ->
                 try {
-                    updateAppWidgetState(context, PreferencesGlanceStateDefinition, glanceId) { prefs ->
+                    updateAppWidgetState(
+                        context,
+                        PreferencesGlanceStateDefinition,
+                        glanceId
+                    ) { prefs ->
                         prefs.toMutablePreferences().apply {
                             this[TransparencyKey] = transparency
                         }
@@ -75,8 +87,8 @@ class MathClockWidget : GlanceAppWidget() {
                     Log.e("MathClockWidget", "Failed to update state for $glanceId", e)
                 }
             }
-            
-            // 2. Immediate update of all widgets
+
+            // Immediate update of all widgets
             MathClockWidget().updateAll(context)
             Log.d("MathClockWidget", "updateAll(context) executed")
         }
@@ -87,9 +99,9 @@ class MathClockWidget : GlanceAppWidget() {
         provideContent {
             val glancePrefs = currentState<Preferences>()
             val transparency = glancePrefs[TransparencyKey] ?: INITIAL_TRANSPARENCY
-            
+
             Log.d("MathClockWidget", "Rendering with transparency: $transparency")
-            
+
             GlanceTheme {
                 WidgetContent(context, transparency)
             }
@@ -101,7 +113,10 @@ class MathClockWidget : GlanceAppWidget() {
         val now = Date()
         val size = LocalSize.current
         val wordTime = timeInWords(now)
-        Log.d("MathClockWidget", "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime")
+        Log.d(
+            "MathClockWidget",
+            "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime"
+        )
 
         // Use transparency from state
         val alpha = (100 - transparency) / 100f
@@ -131,9 +146,9 @@ class MathClockWidget : GlanceAppWidget() {
                     modifier = GlanceModifier
                         .fillMaxWidth()
                 )
-                
+
                 Spacer(modifier = GlanceModifier.height(8.dp))
-                
+
                 Text(
                     text = wordTime,
                     style = TextStyle(
@@ -152,12 +167,11 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
         Log.d("MathClockWidget", "onReceive: ${intent.action}")
-        
+
         when (intent.action) {
             MathClockWidget.ACTION_UPDATE,
-            Intent.ACTION_TIME_TICK, 
-            Intent.ACTION_TIME_CHANGED, 
-            Intent.ACTION_TIMEZONE_CHANGED, 
+            Intent.ACTION_TIME_CHANGED,
+            Intent.ACTION_TIMEZONE_CHANGED,
             Intent.ACTION_USER_PRESENT -> {
                 val pendingResult = goAsync()
                 MainScope().launch {
@@ -172,10 +186,12 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
                 }
                 scheduleUpdate(context)
             }
+
             "android.appwidget.action.APPWIDGET_UPDATE" -> {
                 super.onReceive(context, intent)
                 scheduleUpdate(context)
             }
+
             else -> {
                 super.onReceive(context, intent)
             }
@@ -198,13 +214,13 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
+
         // Target the exact start of the next minute
         val now = System.currentTimeMillis()
         val nextMinute = (now / 60000 + 1) * 60000
-        
+
         Log.d("MathClockWidget", "Scheduling exact update for the next minute: $nextMinute")
-        
+
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
             nextMinute,
