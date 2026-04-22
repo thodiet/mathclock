@@ -32,6 +32,7 @@ import androidx.glance.LocalSize
 import androidx.glance.layout.height
 import java.util.Date
 import androidx.glance.background
+import androidx.glance.color.ColorProvider
 import androidx.glance.layout.Box
 import androidx.glance.GlanceTheme
 import androidx.glance.layout.fillMaxWidth
@@ -120,7 +121,10 @@ class MathClockWidget : GlanceAppWidget() {
 
         // Use transparency from state
         val alpha = (100 - transparency) / 100f
-        val widgetBackgroundColor = Color.Black.copy(alpha = alpha)
+        val widgetBackgroundColor = ColorProvider(
+            day = Color.White.copy(alpha = alpha),
+            night = Color.Black.copy(alpha = alpha)
+        )
 
         // Dynamic font size based on widget width (size.width is in dp)
         val calculatedFontSize = when {
