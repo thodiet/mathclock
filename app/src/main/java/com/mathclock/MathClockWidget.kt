@@ -225,11 +225,20 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
 
         Log.d("MathClockWidget", "Scheduling exact update for the next minute: $nextMinute")
 
-        alarmManager.setExactAndAllowWhileIdle(
-            AlarmManager.RTC_WAKEUP,
-            nextMinute,
-            pendingIntent
-        )
+        try {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                nextMinute,
+                pendingIntent
+            )
+        } catch (e: SecurityException) {
+            Log.e("MathClockWidget", "Exact alarm permission not granted, falling back to non-exact alarm", e)
+            alarmManager.set(
+                AlarmManager.RTC_WAKEUP,
+                nextMinute,
+                pendingIntent
+            )
+        }
     }
 
     override fun onDisabled(context: Context) {
