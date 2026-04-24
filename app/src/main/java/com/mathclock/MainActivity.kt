@@ -44,6 +44,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.math.roundToInt
 
 enum class Screen {
     Clock, Info
@@ -144,7 +145,7 @@ fun DigitalClock() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Hintergrund-Transparenz: $transparency%",
+            text = "Hintergrund-Transparenz: ${transparency.roundToInt()}%",
             style = MaterialTheme.typography.bodyLarge
         )
         Slider(
