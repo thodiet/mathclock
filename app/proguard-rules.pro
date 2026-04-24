@@ -1,3 +1,4 @@
+# noinspection ShrinkerUnresolvedReference
 # Jetpack Compose Glance Rules
 -keep class androidx.glance.appwidget.GlanceAppWidget { *; }
 -keep class androidx.glance.appwidget.GlanceAppWidgetReceiver { *; }
