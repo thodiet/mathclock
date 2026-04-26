@@ -7,46 +7,46 @@ import android.content.Intent
 import android.util.Log
 import android.widget.RemoteViews
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.unit.DpSize
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.glance.GlanceId
 import androidx.glance.GlanceModifier
+import androidx.glance.GlanceTheme
+import androidx.glance.LocalSize
 import androidx.glance.action.actionStartActivity
 import androidx.glance.action.clickable
 import androidx.glance.appwidget.AndroidRemoteViews
 import androidx.glance.appwidget.GlanceAppWidget
+import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.GlanceAppWidgetReceiver
-import androidx.glance.appwidget.provideContent
-import androidx.glance.layout.Alignment
-import androidx.glance.layout.Column
-import androidx.glance.layout.fillMaxSize
-import androidx.glance.text.Text
-import androidx.glance.text.TextStyle
-import androidx.glance.appwidget.updateAll
 import androidx.glance.appwidget.SizeMode
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
-import androidx.glance.layout.Spacer
-import androidx.glance.LocalSize
-import androidx.glance.layout.height
-import java.util.Date
+import androidx.glance.appwidget.provideContent
+import androidx.glance.appwidget.state.updateAppWidgetState
+import androidx.glance.appwidget.updateAll
 import androidx.glance.background
 import androidx.glance.color.ColorProvider
-import androidx.glance.layout.Box
-import androidx.glance.GlanceTheme
-import androidx.glance.layout.fillMaxWidth
-import androidx.compose.ui.graphics.Color
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.glance.currentState
+import androidx.glance.layout.Alignment
+import androidx.glance.layout.Box
+import androidx.glance.layout.Column
+import androidx.glance.layout.Spacer
+import androidx.glance.layout.fillMaxSize
+import androidx.glance.layout.fillMaxWidth
+import androidx.glance.layout.height
 import androidx.glance.state.PreferencesGlanceStateDefinition
-import androidx.glance.appwidget.state.updateAppWidgetState
-import androidx.glance.appwidget.GlanceAppWidgetManager
+import androidx.glance.text.Text
+import androidx.glance.text.TextStyle
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import java.util.Date
 
 class MathClockWidget : GlanceAppWidget() {
 
-        override val sizeMode = SizeMode.Responsive(
+    override val sizeMode = SizeMode.Responsive(
         setOf(
             DpSize(100.dp, 50.dp),
             DpSize(150.dp, 50.dp),
@@ -232,7 +232,11 @@ class MathClockWidgetReceiver : GlanceAppWidgetReceiver() {
                 pendingIntent
             )
         } catch (e: SecurityException) {
-            Log.e("MathClockWidget", "Exact alarm permission not granted, falling back to non-exact alarm", e)
+            Log.e(
+                "MathClockWidget",
+                "Exact alarm permission not granted, falling back to non-exact alarm",
+                e
+            )
             alarmManager.set(
                 AlarmManager.RTC_WAKEUP,
                 nextMinute,
