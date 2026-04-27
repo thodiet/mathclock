@@ -39,6 +39,7 @@ import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.state.PreferencesGlanceStateDefinition
 import androidx.glance.text.Text
+import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
@@ -157,9 +158,10 @@ class MathClockWidget : GlanceAppWidget() {
                     text = wordTime,
                     style = TextStyle(
                         fontSize = calculatedFontSize,
-                        color = GlanceTheme.colors.onSurface
+                        color = GlanceTheme.colors.onSurface,
+                        textAlign = TextAlign.Center
                     ),
-                    maxLines = 1
+                    maxLines = 2
                 )
             }
         }

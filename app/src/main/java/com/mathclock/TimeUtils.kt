@@ -24,9 +24,9 @@ fun timeInWords(date: Date): String {
     } else {
         val minText = if (offset == 1 || (granularity - offset) == 1) "Minute" else "Minuten"
         if (offset < (granularity / 2.0))
-            "$prefix $offset $minText nach ${fractionInText(fraction)} ${if (fraction == 0) displayHour else nextHour}"
+            "$prefix $offset $minText nach\n${fractionInText(fraction)} ${if (fraction == 0) displayHour else nextHour}"
         else
-            "$prefix ${granularity - offset} $minText vor ${fractionInText(fraction + 1)} $nextHour"
+            "$prefix ${granularity - offset} $minText vor\n${fractionInText(fraction + 1)} $nextHour"
     }
 }
 
@@ -37,7 +37,7 @@ private fun fractionInText(fraction: Int): String {
     return when (fraction) {
         1 -> "Viertel"
         2 -> "Halb"
-        3 -> "Drei Viertel"
+        3 -> "Dreiviertel"
         else -> ""
     }
 }
