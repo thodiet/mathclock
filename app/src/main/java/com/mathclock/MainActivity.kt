@@ -7,10 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
@@ -34,6 +39,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import java.util.Calendar
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.appwidget.GlanceAppWidgetManager
@@ -229,4 +235,78 @@ fun DigitalClockPreview() {
     MathClockTheme {
         DigitalClock()
     }
+}
+
+@Preview(showBackground = true, name = "Test verschiedene Zeiten", heightDp = 800)
+@Composable
+fun TimeInWordsTestPreview() {
+    val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    
+    // Test-Daten generieren
+    val baseCal = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 10)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+    }
+
+    val testZeiten = listOf(0, 1, 7, 8, 14, 15, 16, 22, 23, 29, 30, 31,
+        37, 38, 44, 45, 46, 52, 53, 59).map { mins ->
+        val cal = baseCal.clone() as Calendar
+        cal.set(Calendar.MINUTE, mins)
+        cal.time
+    }
+
+    MathClockTheme {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = "Manuelle Prüfung timeInWords",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            val splitIndex = (testZeiten.size + 1) / 2
+            val firstHalf = testZeiten.take(splitIndex)
+            val secondHalf = testZeiten.drop(splitIndex)
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // left column
+                Column(modifier = Modifier.weight(1f)) {
+                    firstHalf.forEach { date ->
+                        TimeTestItem(date, sdf)
+                    }
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                // right column
+                Column(modifier = Modifier.weight(1f)) {
+                    secondHalf.forEach { date ->
+                        TimeTestItem(date, sdf)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimeTestItem(date: Date, sdf: SimpleDateFormat) {
+    val zeitString = sdf.format(date)
+    Column(modifier = Modifier.padding(vertical = 4.dp)) {
+        Text(
+            text = "$zeitString:",
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.secondary
+        )
+        Text(
+            text = timeInWords(date),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center
+        )
+    }
+    Spacer(modifier = Modifier.height(8.dp))
 }
