@@ -19,14 +19,20 @@ fun timeInWords(date: Date): String {
 
     val prefix = "Es ist"
     return if (offset == 0) {
-        if (fraction == 0) "$prefix $displayHour Uhr"
-        else "$prefix ${fractionInText(fraction)} $nextHour"
+        if (fraction == 0) "$prefix ${hour2word(displayHour, true)}"
+        else "$prefix ${fractionInText(fraction)} ${hour2word(nextHour)}"
     } else {
         val minText = if (offset == 1 || (granularity - offset) == 1) "Minute" else "Minuten"
-        if (offset < (granularity / 2.0))
-            "$prefix $offset $minText nach\n${fractionInText(fraction)} ${if (fraction == 0) displayHour else nextHour}"
-        else
-            "$prefix ${granularity - offset} $minText vor\n${fractionInText(fraction + 1)} $nextHour"
+        if (offset < (granularity / 2.0)) {
+            val hourPostfix : String
+            if (fraction == 0) hourPostfix = hour2word(displayHour)
+            else hourPostfix = hour2word(nextHour)
+            "$prefix ${number2word(offset)} $minText nach\n${fractionInText(fraction)} $hourPostfix"
+        } else {
+            "$prefix ${number2word(granularity - offset)} $minText vor\n${fractionInText(fraction + 1)} ${
+                hour2word(nextHour)
+            }"
+        }
     }
 }
 
@@ -40,4 +46,42 @@ private fun fractionInText(fraction: Int): String {
         3 -> "Dreiviertel"
         else -> ""
     }
+}
+
+/**
+ * Returns the textual representation of a number.
+ */
+private fun number2word(number: Int): String {
+    return when (number) {
+        1 -> "eine"
+        2 -> "zwei"
+        3 -> "drei"
+        4 -> "vier"
+        5 -> "fünf"
+        6 -> "sechs"
+        7 -> "sieben"
+        else -> ""
+    }
+}
+
+/**
+ * Returns the textual representation of an hour.
+ */
+private fun hour2word(number: Int, extended: Boolean = false): String {
+    val hour = when (number) {
+        1 -> if (extended) "ein" else "eins"
+        2 -> "zwei"
+        3 -> "drei"
+        4 -> "vier"
+        5 -> "fünf"
+        6 -> "sechs"
+        7 -> "sieben"
+        8 -> "acht"
+        9 -> "neun"
+        10 -> "zehn"
+        11 -> "elf"
+        12 -> "zwölf"
+        else -> ""
+    }
+    return if (extended) "$hour Uhr" else hour
 }

@@ -129,10 +129,10 @@ class MathClockWidget : GlanceAppWidget() {
 
         // Dynamic font size based on widget width (size.width is in dp)
         val calculatedFontSize = when {
-            size.width < 150.dp -> 8.sp
-            size.width < 250.dp -> 12.sp
-            size.width < 350.dp -> 16.sp
-            else -> 20.sp
+            size.width < 150.dp -> 10.sp
+            size.width < 250.dp -> 14.sp
+            size.width < 350.dp -> 18.sp
+            else -> 22.sp
         }
 
         Box(
@@ -152,7 +152,7 @@ class MathClockWidget : GlanceAppWidget() {
                         .fillMaxWidth()
                 )
 
-                Spacer(modifier = GlanceModifier.height(8.dp))
+                Spacer(modifier = GlanceModifier.height(6.dp))
 
                 Text(
                     text = wordTime,
