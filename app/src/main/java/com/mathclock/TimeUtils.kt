@@ -6,14 +6,13 @@ import java.util.Date
 /**
  * Converts a time into words with fractions of hours.
  */
-fun timeInWords(date: Date): String {
+fun timeInWords(date: Date, granularity: Int = 15): String {
     val cal = Calendar.getInstance().apply { time = date }
     val hour = cal.get(Calendar.HOUR) // 0-11
     val displayHour = if (hour == 0) 12 else hour
     val nextHour = if (displayHour == 12) 1 else displayHour + 1
     val minute = cal.get(Calendar.MINUTE)
 
-    val granularity = 15
     val fraction = minute / granularity
     val offset = minute % granularity
 
