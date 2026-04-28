@@ -19,16 +19,16 @@ fun timeInWords(date: Date, granularity: Int = 15): String {
     val prefix = "Es ist"
     return if (offset == 0) {
         if (fraction == 0) "$prefix ${hour2word(displayHour, true)}"
-        else "$prefix ${fractionInText(fraction)} ${hour2word(nextHour)}"
+        else "$prefix ${fractionInText(fraction, granularity)} ${hour2word(nextHour)}"
     } else {
         val minText = if (offset == 1 || (granularity - offset) == 1) "Minute" else "Minuten"
         if (offset < (granularity / 2.0)) {
             val hourPostfix : String
             if (fraction == 0) hourPostfix = hour2word(displayHour)
             else hourPostfix = hour2word(nextHour)
-            "$prefix ${number2word(offset)} $minText nach\n${fractionInText(fraction)} $hourPostfix"
+            "$prefix ${number2word(offset)} $minText nach\n${fractionInText(fraction, granularity)} $hourPostfix"
         } else {
-            "$prefix ${number2word(granularity - offset)} $minText vor\n${fractionInText(fraction + 1)} ${
+            "$prefix ${number2word(granularity - offset)} $minText vor\n${fractionInText(fraction + 1, granularity)} ${
                 hour2word(nextHour)
             }"
         }
@@ -38,13 +38,33 @@ fun timeInWords(date: Date, granularity: Int = 15): String {
 /**
  * Returns the textual representation of a fraction.
  */
-private fun fractionInText(fraction: Int): String {
-    return when (fraction) {
-        1 -> "Viertel"
-        2 -> "Halb"
-        3 -> "Dreiviertel"
-        else -> ""
+private fun fractionInText(fraction: Int, granularity: Int = 15): String {
+    val result: String
+    if (granularity == 15) {
+        result = when (fraction) {
+            1 -> "Viertel"
+            2 -> "Halb"
+            3 -> "Dreiviertel"
+            else -> ""
+        }
     }
+    else {
+        result = when (fraction) {
+            1 -> "Zwölftel"
+            2 -> "Sechstel"
+            3 -> "Viertel"
+			4 -> "Drittel"
+			5 -> "Fünf Zwölftel"
+			6 -> "Halb"
+			7 -> "Sieben Zwölftel"
+			8 -> "Zwei Drittel"
+			9 -> "Dreiviertel" 
+			10 -> "Fünf Sechstel"
+			11 -> "Elf Zwölftel"
+            else -> ""
+        }
+    }
+    return result
 }
 
 /**
