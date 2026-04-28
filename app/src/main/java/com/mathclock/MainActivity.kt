@@ -2,6 +2,7 @@ package com.mathclock
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.Arrangement
@@ -67,6 +68,10 @@ class MainActivity : ComponentActivity() {
             MathClockTheme {
                 var currentScreen by remember { mutableStateOf(Screen.Clock) }
 
+                BackHandler(enabled = currentScreen == Screen.Info) {
+                    currentScreen = Screen.Clock
+                }
+
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
@@ -74,7 +79,7 @@ class MainActivity : ComponentActivity() {
                             title = {
                                 Text(
                                     when (currentScreen) {
-                                        Screen.Clock -> "Widget Settings"
+                                        Screen.Clock -> "Math Clock Widget Einstellungen"
                                         Screen.Info -> "Info"
                                     }
                                 )
@@ -216,7 +221,7 @@ fun InfoScreen() {
                     "Meine Zeit steht in deinen Händen.\n" +
                     "Ps. 31,16\n\n" +
                     "Vor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben " +
-                    "und Drei Viertel sieben und meint damit 6:15 bzw. 6:45.\n" +
+                    "und Dreiviertel sieben und meint damit 6:15 bzw. 6:45.\n" +
                     "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
                     "habe ich diese App entwickelt.\n" +
                     "Mittels eines Widgets kann man sich die Anzeige " +
