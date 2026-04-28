@@ -190,6 +190,12 @@ fun DigitalClock() {
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = timeInWords(currentDate, 5),
+                style = MaterialTheme.typography.headlineSmall,
+                textAlign = TextAlign.Center
+            )
         }
     }
 }
