@@ -36,6 +36,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -240,7 +241,8 @@ fun DigitalClockPreview() {
 @Preview(showBackground = true, name = "Test verschiedene Zeiten", heightDp = 800)
 @Composable
 fun TimeInWordsTestPreview() {
-    val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+    val locale = LocalConfiguration.current.locales[0]
+    val sdf = SimpleDateFormat("HH:mm:ss", locale)
     
     // Test-Daten generieren
     val baseCal = Calendar.getInstance().apply {
