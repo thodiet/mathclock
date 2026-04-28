@@ -243,12 +243,12 @@ fun DigitalClockPreview() {
     }
 }
 
-@Preview(showBackground = true, name = "Test verschiedene Zeiten", heightDp = 800)
+@Preview(showBackground = true, name = "Show 15 minutes times", heightDp = 800)
 @Composable
 fun TimeInWordsTestPreview() {
     val locale = LocalConfiguration.current.locales[0]
     val sdf = SimpleDateFormat("HH:mm:ss", locale)
-    
+
     // Test-Daten generieren
     val baseCal = Calendar.getInstance().apply {
         set(Calendar.HOUR_OF_DAY, 10)
@@ -270,7 +270,7 @@ fun TimeInWordsTestPreview() {
                 .verticalScroll(rememberScrollState())
         ) {
             Text(
-                text = "Manuelle Prüfung timeInWords",
+                text = "timeInWords, granularity = 15",
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.padding(bottom = 8.dp)
             )
@@ -286,9 +286,9 @@ fun TimeInWordsTestPreview() {
                         TimeTestItem(date, sdf)
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.width(16.dp))
-                
+
                 // right column
                 Column(modifier = Modifier.weight(1f)) {
                     secondHalf.forEach { date ->
@@ -300,8 +300,176 @@ fun TimeInWordsTestPreview() {
     }
 }
 
+@Preview(showBackground = true, name = "Show 5 minutes times", heightDp = 800)
 @Composable
-private fun TimeTestItem(date: Date, sdf: SimpleDateFormat) {
+fun TimeInWords5_19TestPreview() {
+    val locale = LocalConfiguration.current.locales[0]
+    val sdf = SimpleDateFormat("HH:mm:ss", locale)
+
+    // Test-Daten generieren
+    val baseCal = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 10)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+    }
+
+    val testZeiten = (0..19).map { mins ->
+        val cal = baseCal.clone() as Calendar
+        cal.set(Calendar.MINUTE, mins)
+        cal.time
+    }
+
+    MathClockTheme {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = "timeInWords, granularity = 5, 0-19",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            val splitIndex = (testZeiten.size + 1) / 2
+            val firstHalf = testZeiten.take(splitIndex)
+            val secondHalf = testZeiten.drop(splitIndex)
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // left column
+                Column(modifier = Modifier.weight(1f)) {
+                    firstHalf.forEach { date ->
+                        TimeTestItem(date, sdf, 5)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // right column
+                Column(modifier = Modifier.weight(1f)) {
+                    secondHalf.forEach { date ->
+                        TimeTestItem(date, sdf, 5)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Show 5 minutes times", heightDp = 800)
+@Composable
+fun TimeInWords5_39TestPreview() {
+    val locale = LocalConfiguration.current.locales[0]
+    val sdf = SimpleDateFormat("HH:mm:ss", locale)
+
+    // Test-Daten generieren
+    val baseCal = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 10)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+    }
+
+    val testZeiten = (20..39).map { mins ->
+        val cal = baseCal.clone() as Calendar
+        cal.set(Calendar.MINUTE, mins)
+        cal.time
+    }
+
+    MathClockTheme {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = "timeInWords, granularity = 5, 20-39",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            val splitIndex = (testZeiten.size + 1) / 2
+            val firstHalf = testZeiten.take(splitIndex)
+            val secondHalf = testZeiten.drop(splitIndex)
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // left column
+                Column(modifier = Modifier.weight(1f)) {
+                    firstHalf.forEach { date ->
+                        TimeTestItem(date, sdf, 5)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // right column
+                Column(modifier = Modifier.weight(1f)) {
+                    secondHalf.forEach { date ->
+                        TimeTestItem(date, sdf, 5)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Preview(showBackground = true, name = "Show 5 minutes times", heightDp = 800)
+@Composable
+fun TimeInWords5_59TestPreview() {
+    val locale = LocalConfiguration.current.locales[0]
+    val sdf = SimpleDateFormat("HH:mm:ss", locale)
+
+    // Test-Daten generieren
+    val baseCal = Calendar.getInstance().apply {
+        set(Calendar.HOUR_OF_DAY, 10)
+        set(Calendar.MINUTE, 0)
+        set(Calendar.SECOND, 0)
+    }
+
+    val testZeiten = (40..59).map { mins ->
+        val cal = baseCal.clone() as Calendar
+        cal.set(Calendar.MINUTE, mins)
+        cal.time
+    }
+
+    MathClockTheme {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+                .verticalScroll(rememberScrollState())
+        ) {
+            Text(
+                text = "timeInWords, granularity = 5, 40-59",
+                style = MaterialTheme.typography.titleMedium,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+
+            val splitIndex = (testZeiten.size + 1) / 2
+            val firstHalf = testZeiten.take(splitIndex)
+            val secondHalf = testZeiten.drop(splitIndex)
+
+            Row(modifier = Modifier.fillMaxWidth()) {
+                // left column
+                Column(modifier = Modifier.weight(1f)) {
+                    firstHalf.forEach { date ->
+                        TimeTestItem(date, sdf, 5)
+                    }
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // right column
+                Column(modifier = Modifier.weight(1f)) {
+                    secondHalf.forEach { date ->
+                        TimeTestItem(date, sdf, 5)
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun TimeTestItem(date: Date, sdf: SimpleDateFormat, granularity: Int = 15) {
     val zeitString = sdf.format(date)
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Text(
@@ -310,7 +478,7 @@ private fun TimeTestItem(date: Date, sdf: SimpleDateFormat) {
             color = MaterialTheme.colorScheme.secondary
         )
         Text(
-            text = timeInWords(date),
+            text = timeInWords(date, granularity),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )
