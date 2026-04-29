@@ -11,6 +11,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.glance.GlanceId
@@ -59,7 +60,9 @@ class MathClockWidget : GlanceAppWidget() {
 
     companion object {
         const val INITIAL_TRANSPARENCY = 40f
+        const val INITIAL_GRANULARITY = 15
         val TransparencyKey = floatPreferencesKey("transparency")
+        val GranularityKey = intPreferencesKey("granularity")
         const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
 
         /**
@@ -70,8 +73,6 @@ class MathClockWidget : GlanceAppWidget() {
 
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
-
-            Log.d("MathClockWidget", "Found ${glanceIds.size} widgets to update")
 
             glanceIds.forEach { glanceId ->
                 try {
@@ -84,15 +85,40 @@ class MathClockWidget : GlanceAppWidget() {
                             this[TransparencyKey] = transparency
                         }
                     }
-                    Log.d("MathClockWidget", "State updated for $glanceId")
                 } catch (e: Exception) {
-                    Log.e("MathClockWidget", "Failed to update state for $glanceId", e)
+                    Log.e("MathClockWidget", "Failed to update transparency for $glanceId", e)
                 }
             }
 
-            // Immediate update of all widgets
             MathClockWidget().updateAll(context)
-            Log.d("MathClockWidget", "updateAll(context) executed")
+        }
+
+        /**
+         * Updates the granularity for all widgets and triggers an immediate redraw.
+         */
+        suspend fun updateGranularity(context: Context, granularity: Int) {
+            Log.d("MathClockWidget", "updateGranularity called with: $granularity")
+
+            val manager = GlanceAppWidgetManager(context)
+            val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
+
+            glanceIds.forEach { glanceId ->
+                try {
+                    updateAppWidgetState(
+                        context,
+                        PreferencesGlanceStateDefinition,
+                        glanceId
+                    ) { prefs ->
+                        prefs.toMutablePreferences().apply {
+                            this[GranularityKey] = granularity
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("MathClockWidget", "Failed to update granularity for $glanceId", e)
+                }
+            }
+
+            MathClockWidget().updateAll(context)
         }
     }
 
@@ -101,20 +127,21 @@ class MathClockWidget : GlanceAppWidget() {
         provideContent {
             val glancePrefs = currentState<Preferences>()
             val transparency = glancePrefs[TransparencyKey] ?: INITIAL_TRANSPARENCY
+            val granularity = glancePrefs[GranularityKey] ?: INITIAL_GRANULARITY
 
-            Log.d("MathClockWidget", "Rendering with transparency: $transparency")
+            Log.d("MathClockWidget", "Rendering with transparency: $transparency, granularity: $granularity")
 
             GlanceTheme {
-                WidgetContent(context, transparency)
+                WidgetContent(context, transparency, granularity)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context, transparency: Float) {
+    private fun WidgetContent(context: Context, transparency: Float, granularity: Int) {
         val now = Date()
         val size = LocalSize.current
-        val wordTime = timeInWords(now)
+        val wordTime = timeInWords(now, granularity)
         Log.d(
             "MathClockWidget",
             "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime"

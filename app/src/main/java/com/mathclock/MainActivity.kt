@@ -16,6 +16,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.selection.selectableGroup
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -24,6 +26,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
@@ -32,6 +35,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -39,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import java.util.Calendar
@@ -130,8 +135,11 @@ fun DigitalClock() {
     var transparency by remember {
         mutableFloatStateOf(MathClockWidget.INITIAL_TRANSPARENCY)
     }
+    var granularity by remember {
+        mutableIntStateOf(MathClockWidget.INITIAL_GRANULARITY)
+    }
 
-    // Load initial value from Glance state
+    // Load initial values from Glance state
     LaunchedEffect(Unit) {
         val manager = GlanceAppWidgetManager(current)
         val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
@@ -142,6 +150,8 @@ fun DigitalClock() {
             )
             transparency =
                 state[MathClockWidget.TransparencyKey] ?: MathClockWidget.INITIAL_TRANSPARENCY
+            granularity =
+                state[MathClockWidget.GranularityKey] ?: MathClockWidget.INITIAL_GRANULARITY
         }
     }
 
@@ -175,6 +185,56 @@ fun DigitalClock() {
             valueRange = 0f..100f
         )
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Anzeige-Granularität:",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        val radioOptions = listOf(15, 5)
+        val radioLabels = listOf("15 Min (Viertel)", "5 Min (Zwölftel)")
+
+        Row(
+            Modifier
+                .selectableGroup()
+                .fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            radioOptions.forEachIndexed { index, option ->
+                Row(
+                    Modifier
+                        .selectable(
+                            selected = (option == granularity),
+                            onClick = {
+                                granularity = option
+                                MainScope().launch {
+                                    MathClockWidget.updateGranularity(
+                                        current.applicationContext,
+                                        granularity
+                                    )
+                                }
+                            },
+                            role = Role.RadioButton
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    RadioButton(
+                        selected = (option == granularity),
+                        onClick = null // null because of selectable modifier
+                    )
+                    Text(
+                        text = radioLabels[index],
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.padding(start = 8.dp)
+                    )
+                }
+            }
+        }
+
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -186,13 +246,7 @@ fun DigitalClock() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = timeInWords(currentDate),
-                style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center
-            )
-            Spacer(modifier = Modifier.height(24.dp))
-            Text(
-                text = timeInWords(currentDate, 5),
+                text = timeInWords(currentDate, granularity),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
