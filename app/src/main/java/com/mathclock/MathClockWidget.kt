@@ -66,11 +66,9 @@ class MathClockWidget : GlanceAppWidget() {
         const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
 
         /**
-         * Updates the transparency for all widgets and triggers an immediate redraw.
+         * Generic helper to update widget preferences.
          */
-        suspend fun updateTransparency(context: Context, transparency: Float) {
-            Log.d("MathClockWidget", "updateTransparency called with: $transparency")
-
+        private suspend fun <T> updateWidgetPreference(context: Context, key: Preferences.Key<T>, value: T) {
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
 
@@ -82,11 +80,11 @@ class MathClockWidget : GlanceAppWidget() {
                         glanceId
                     ) { prefs ->
                         prefs.toMutablePreferences().apply {
-                            this[TransparencyKey] = transparency
+                            this[key] = value
                         }
                     }
                 } catch (e: Exception) {
-                    Log.e("MathClockWidget", "Failed to update transparency for $glanceId", e)
+                    Log.e("MathClockWidget", "Failed to update ${key.name} for $glanceId", e)
                 }
             }
 
@@ -94,31 +92,19 @@ class MathClockWidget : GlanceAppWidget() {
         }
 
         /**
+         * Updates the transparency for all widgets and triggers an immediate redraw.
+         */
+        suspend fun updateTransparency(context: Context, transparency: Float) {
+            Log.d("MathClockWidget", "updateTransparency called with: $transparency")
+            updateWidgetPreference(context, TransparencyKey, transparency)
+        }
+
+        /**
          * Updates the granularity for all widgets and triggers an immediate redraw.
          */
         suspend fun updateGranularity(context: Context, granularity: Int) {
             Log.d("MathClockWidget", "updateGranularity called with: $granularity")
-
-            val manager = GlanceAppWidgetManager(context)
-            val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
-
-            glanceIds.forEach { glanceId ->
-                try {
-                    updateAppWidgetState(
-                        context,
-                        PreferencesGlanceStateDefinition,
-                        glanceId
-                    ) { prefs ->
-                        prefs.toMutablePreferences().apply {
-                            this[GranularityKey] = granularity
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("MathClockWidget", "Failed to update granularity for $glanceId", e)
-                }
-            }
-
-            MathClockWidget().updateAll(context)
+            updateWidgetPreference(context, GranularityKey, granularity)
         }
     }
 

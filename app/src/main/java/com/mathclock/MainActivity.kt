@@ -284,6 +284,7 @@ fun InfoScreen() {
                     "und Dreiviertel sieben und meint damit 6:15 bzw. 6:45.\n" +
                     "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
                     "habe ich diese App entwickelt.\n" +
+                    "Wer gerne auch mit kleineren Brüchen umgeht, kann die Granularität auf 5 Minuten verringern.\n" +
                     "Mittels eines Widgets kann man sich die Anzeige " +
                     "auch auf den Startbildschirm legen.\n" +
                     "Wegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. " +
