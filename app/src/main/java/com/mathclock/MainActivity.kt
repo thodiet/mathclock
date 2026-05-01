@@ -43,6 +43,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
@@ -90,8 +91,8 @@ class MainActivity : ComponentActivity() {
                             title = {
                                 Text(
                                     when (currentScreen) {
-                                        Screen.Clock -> "Math Clock Widget Einstellungen"
-                                        Screen.Info -> "Info"
+                                        Screen.Clock -> stringResource(R.string.settings_title)
+                                        Screen.Info -> stringResource(R.string.info_title)
                                     }
                                 )
                             },
@@ -100,7 +101,7 @@ class MainActivity : ComponentActivity() {
                                     IconButton(onClick = { currentScreen = Screen.Clock }) {
                                         Icon(
                                             Icons.AutoMirrored.Filled.ArrowBack,
-                                            contentDescription = "Zurück"
+                                            contentDescription = stringResource(R.string.back_content_description)
                                         )
                                     }
                                 }
@@ -108,7 +109,7 @@ class MainActivity : ComponentActivity() {
                             actions = {
                                 if (currentScreen == Screen.Clock) {
                                     IconButton(onClick = { currentScreen = Screen.Info }) {
-                                        Icon(Icons.Default.Info, contentDescription = "Info")
+                                        Icon(Icons.Default.Info, contentDescription = stringResource(R.string.info_title))
                                     }
                                 }
                             }
@@ -175,7 +176,7 @@ fun DigitalClock() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = "Hintergrund-Transparenz: ${transparency.roundToInt()}%",
+            text = stringResource(R.string.transparency_label, transparency.roundToInt()),
             style = MaterialTheme.typography.bodyLarge
         )
         Slider(
@@ -194,14 +195,17 @@ fun DigitalClock() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Anzeige-Granularität:",
+            text = stringResource(R.string.granularity_label),
             style = MaterialTheme.typography.bodyLarge
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         val radioOptions = listOf(15, 5)
-        val radioLabels = listOf("15 Min (Viertel)", "5 Min (Zwölftel)")
+        val radioLabels = listOf(
+            stringResource(R.string.granularity_15),
+            stringResource(R.string.granularity_5)
+        )
 
         Row(
             Modifier
@@ -252,7 +256,7 @@ fun DigitalClock() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = timeInWords(currentDate, granularity),
+                text = timeInWords(current, currentDate, granularity),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
@@ -267,12 +271,9 @@ private fun formatTime(date: Date): String {
 
 @Composable
 fun InfoScreen() {
+    val context = LocalContext.current
     val infoText = buildAnnotatedString {
-        append(
-            "Jesus Christus spricht:\n" +
-                    "Ich bin der Weg! Ich bin die Wahrheit und das Leben! " +
-                    "Zum Vater kommt man nur durch mich.\n"
-        )
+        append(stringResource(R.string.info_jesus_christ))
         withLink(
             LinkAnnotation.Url(
                 url = "https://www.bibleserver.com/Ne%C3%9C/Johannes14%2C6",
@@ -283,11 +284,8 @@ fun InfoScreen() {
                     )
                 )
             )
-        ) { append("Joh. 14,6") }
-        append(
-            "\n\nDavid betet:\n" +
-                    "Meine Zeit steht in deinen Händen.\n"
-        )
+        ) { append(stringResource(R.string.info_john_14_6)) }
+        append(stringResource(R.string.info_david_pray))
         withLink(
             LinkAnnotation.Url(
                 url = "https://www.bibleserver.com/LUT/Psalm31%2C16",
@@ -298,19 +296,8 @@ fun InfoScreen() {
                     )
                 )
             )
-        ) { append("Ps. 31,16") }
-        append(
-            "\n\nVor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben " +
-                    "und Dreiviertel sieben und meint damit 6:15 bzw. 6:45.\n" +
-                    "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
-                    "habe ich diese App entwickelt.\n" +
-                    "Wer gerne auch mit kleineren Brüchen umgeht, kann die Granularität auf 5 Minuten verringern.\n" +
-                    "Mittels eines Widgets kann man sich die Anzeige " +
-                    "auch auf den Startbildschirm legen.\n" +
-                    "Wegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. " +
-                    "Das sollte sich nach 1-2 Minuten stabilisieren.\n\n" +
-                    "Alle Ehre dem Herrn Jesus Christus!",
-        )
+        ) { append(stringResource(R.string.info_psalm_31_16)) }
+        append(stringResource(R.string.info_explanation))
     }
 
     Column(
@@ -320,7 +307,7 @@ fun InfoScreen() {
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            text = "Willkommen zur Math Clock",
+            text = stringResource(R.string.welcome_title),
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -575,6 +562,7 @@ fun TimeInWords5_59TestPreview() {
 
 @Composable
 private fun TimeTestItem(date: Date, sdf: SimpleDateFormat, granularity: Int = 15) {
+    val context = LocalContext.current
     val zeitString = sdf.format(date)
     Column(modifier = Modifier.padding(vertical = 4.dp)) {
         Text(
@@ -583,7 +571,7 @@ private fun TimeTestItem(date: Date, sdf: SimpleDateFormat, granularity: Int = 1
             color = MaterialTheme.colorScheme.secondary
         )
         Text(
-            text = timeInWords(date, granularity),
+            text = timeInWords(context, date, granularity),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center
         )

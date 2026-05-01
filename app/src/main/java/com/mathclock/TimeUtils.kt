@@ -1,12 +1,13 @@
 package com.mathclock
 
+import android.content.Context
 import java.util.Calendar
 import java.util.Date
 
 /**
  * Converts a time into words with fractions of hours.
  */
-fun timeInWords(date: Date, granularity: Int = 15): String {
+fun timeInWords(context: Context, date: Date, granularity: Int = 15): String {
     val cal = Calendar.getInstance().apply { time = date }
     val hour = cal.get(Calendar.HOUR) // 0-11
     val displayHour = if (hour == 0) 12 else hour
@@ -16,20 +17,21 @@ fun timeInWords(date: Date, granularity: Int = 15): String {
     val fraction = minute / granularity
     val offset = minute % granularity
 
-    val prefix = "Es ist"
+    val prefix = context.getString(R.string.time_prefix)
     return if (offset == 0) {
-        if (fraction == 0) "$prefix ${hour2word(displayHour, true)}"
-        else "$prefix ${fractionInText(fraction, granularity)} ${hour2word(nextHour)}"
+        if (fraction == 0) "$prefix ${hour2word(context, displayHour, true)}"
+        else "$prefix ${fractionInText(context, fraction, granularity)} ${hour2word(context, nextHour)}"
     } else {
-        val minText = if (offset == 1 || (granularity - offset) == 1) "Minute" else "Minuten"
+        val minRes = if (offset == 1 || (granularity - offset) == 1) R.string.time_minute else R.string.time_minutes
+        val minText = context.getString(minRes)
         if (offset < (granularity / 2.0)) {
             val hourPostfix : String
-            if (fraction == 0) hourPostfix = hour2word(displayHour)
-            else hourPostfix = hour2word(nextHour)
-            "$prefix ${number2word(offset)} $minText nach\n${fractionInText(fraction, granularity)} $hourPostfix"
+            if (fraction == 0) hourPostfix = hour2word(context, displayHour)
+            else hourPostfix = hour2word(context, nextHour)
+            "$prefix ${number2word(context, offset)} $minText ${context.getString(R.string.time_after)}\n${fractionInText(context, fraction, granularity)} $hourPostfix"
         } else {
-            "$prefix ${number2word(granularity - offset)} $minText vor\n${fractionInText(fraction + 1, granularity)} ${
-                hour2word(nextHour)
+            "$prefix ${number2word(context, granularity - offset)} $minText ${context.getString(R.string.time_before)}\n${fractionInText(context, fraction + 1, granularity)} ${
+                hour2word(context, nextHour)
             }"
         }
     }
@@ -38,69 +40,69 @@ fun timeInWords(date: Date, granularity: Int = 15): String {
 /**
  * Returns the textual representation of a fraction.
  */
-private fun fractionInText(fraction: Int, granularity: Int = 15): String {
-    val result: String
-    if (granularity == 15) {
-        result = when (fraction) {
-            1 -> "Viertel"
-            2 -> "Halb"
-            3 -> "Dreiviertel"
-            else -> ""
+private fun fractionInText(context: Context, fraction: Int, granularity: Int = 15): String {
+    val resId = if (granularity == 15) {
+        when (fraction) {
+            1 -> R.string.fraction_quarter
+            2 -> R.string.fraction_half
+            3 -> R.string.fraction_three_quarters
+            else -> 0
+        }
+    } else {
+        when (fraction) {
+            1 -> R.string.fraction_twelfth
+            2 -> R.string.fraction_sixth
+            3 -> R.string.fraction_quarter
+            4 -> R.string.fraction_third
+            5 -> R.string.fraction_five_twelfths
+            6 -> R.string.fraction_half
+            7 -> R.string.fraction_seven_twelfths
+            8 -> R.string.fraction_two_thirds
+            9 -> R.string.fraction_three_quarters
+            10 -> R.string.fraction_five_sixths
+            11 -> R.string.fraction_eleven_twelfths
+            else -> 0
         }
     }
-    else {
-        result = when (fraction) {
-            1 -> "Zwölftel"
-            2 -> "Sechstel"
-            3 -> "Viertel"
-			4 -> "Drittel"
-			5 -> "Fünf Zwölftel"
-			6 -> "Halb"
-			7 -> "Sieben Zwölftel"
-			8 -> "Zwei Drittel"
-			9 -> "Dreiviertel" 
-			10 -> "Fünf Sechstel"
-			11 -> "Elf Zwölftel"
-            else -> ""
-        }
-    }
-    return result
+    return if (resId != 0) context.getString(resId) else ""
 }
 
 /**
  * Returns the textual representation of a number.
  */
-private fun number2word(number: Int): String {
-    return when (number) {
-        1 -> "eine"
-        2 -> "zwei"
-        3 -> "drei"
-        4 -> "vier"
-        5 -> "fünf"
-        6 -> "sechs"
-        7 -> "sieben"
-        else -> ""
+private fun number2word(context: Context, number: Int): String {
+    val resId = when (number) {
+        1 -> R.string.num_1_fem
+        2 -> R.string.num_2
+        3 -> R.string.num_3
+        4 -> R.string.num_4
+        5 -> R.string.num_5
+        6 -> R.string.num_6
+        7 -> R.string.num_7
+        else -> 0
     }
+    return if (resId != 0) context.getString(resId) else ""
 }
 
 /**
  * Returns the textual representation of an hour.
  */
-private fun hour2word(number: Int, extended: Boolean = false): String {
-    val hour = when (number) {
-        1 -> if (extended) "ein" else "eins"
-        2 -> "zwei"
-        3 -> "drei"
-        4 -> "vier"
-        5 -> "fünf"
-        6 -> "sechs"
-        7 -> "sieben"
-        8 -> "acht"
-        9 -> "neun"
-        10 -> "zehn"
-        11 -> "elf"
-        12 -> "zwölf"
-        else -> ""
+private fun hour2word(context: Context, number: Int, extended: Boolean = false): String {
+    val resId = when (number) {
+        1 -> if (extended) R.string.num_1_masc else R.string.num_1_neut
+        2 -> R.string.num_2
+        3 -> R.string.num_3
+        4 -> R.string.num_4
+        5 -> R.string.num_5
+        6 -> R.string.num_6
+        7 -> R.string.num_7
+        8 -> R.string.num_8
+        9 -> R.string.num_9
+        10 -> R.string.num_10
+        11 -> R.string.num_11
+        12 -> R.string.num_12
+        else -> 0
     }
-    return if (extended) "$hour Uhr" else hour
+    val hour = if (resId != 0) context.getString(resId) else ""
+    return if (extended) "$hour ${context.getString(R.string.time_suffix_o_clock)}" else hour
 }

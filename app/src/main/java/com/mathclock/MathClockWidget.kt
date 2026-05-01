@@ -127,7 +127,7 @@ class MathClockWidget : GlanceAppWidget() {
     private fun WidgetContent(context: Context, transparency: Float, granularity: Int) {
         val now = Date()
         val size = LocalSize.current
-        val wordTime = timeInWords(now, granularity)
+        val wordTime = timeInWords(context, now, granularity)
         Log.d(
             "MathClockWidget",
             "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime"

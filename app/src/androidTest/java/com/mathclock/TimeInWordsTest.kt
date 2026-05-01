@@ -1,18 +1,24 @@
 package com.mathclock
 
-import java.util.Calendar
-import java.util.Date
+import androidx.test.platform.app.InstrumentationRegistry
+import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import java.util.Calendar
+import java.util.Date
 
+@RunWith(AndroidJUnit4::class)
 class TimeInWordsTest {
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     @Test
     fun test_0() {
         val cal = Calendar.getInstance()
         cal.set(Calendar.MINUTE, 0)
         val date: Date = cal.time
 
-        val result = timeInWords(date)
+        val result = timeInWords(context, date)
 
         assertTrue(
             "0: Expected 'Uhr' in the output, but was: $result",
@@ -37,7 +43,7 @@ class TimeInWordsTest {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date)
+            val result = timeInWords(context, date)
 
             assertTrue(
                 "$it: Expected 'vor' in the output, but was: $result",
@@ -59,7 +65,7 @@ class TimeInWordsTest {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date)
+            val result = timeInWords(context, date)
 
             assertTrue(
                 "$it: Expected 'nach' in the output, but was: $result",
@@ -81,7 +87,7 @@ class TimeInWordsTest {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date)
+            val result = timeInWords(context, date)
 
             assertTrue(
                 "$it: Expected no 'vor' in the output, but was: $result",
@@ -107,7 +113,7 @@ class TimeInWordsTest {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date)
+            val result = timeInWords(context, date)
 
             assertTrue(
                 "$it: Expected 'Viertel' in the output, but was: $result",
@@ -129,7 +135,7 @@ class TimeInWordsTest {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date)
+            val result = timeInWords(context, date)
 
             assertTrue(
                 "$it: Expected 'Halb' in the output, but was: $result",
@@ -151,7 +157,7 @@ class TimeInWordsTest {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date)
+            val result = timeInWords(context, date)
 
             assertTrue(
                 "$it: Expected 'Dreiviertel' in the output, but was: $result",
@@ -165,14 +171,17 @@ class TimeInWordsTest {
     }
 }
 
+@RunWith(AndroidJUnit4::class)
 class TimeInWordsTest5 {
+    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
     @Test
     fun test_0() {
         val cal = Calendar.getInstance()
         cal.set(Calendar.MINUTE, 0)
         val date: Date = cal.time
 
-        val result = timeInWords(date, 5)
+        val result = timeInWords(context, date, 5)
 
         assertTrue(
             "0: Expected 'Uhr' in the output, but was: $result",
@@ -197,7 +206,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'vor' in the output, but was: $result",
@@ -219,7 +228,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'nach' in the output, but was: $result",
@@ -241,7 +250,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected no 'vor' in the output, but was: $result",
@@ -267,7 +276,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Zwölftel' in the output, but was: $result",
@@ -289,7 +298,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Sechstel' in the output, but was: $result",
@@ -311,7 +320,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Viertel' in the output, but was: $result",
@@ -333,7 +342,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Drittel' in the output, but was: $result",
@@ -355,7 +364,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Fünf Zwölftel' in the output, but was: $result",
@@ -377,7 +386,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Halb' in the output, but was: $result",
@@ -399,7 +408,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Sieben Zwölftel' in the output, but was: $result",
@@ -421,7 +430,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Zwei Drittel' in the output, but was: $result",
@@ -443,7 +452,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Dreiviertel' in the output, but was: $result",
@@ -465,7 +474,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Fünf Sechstel' in the output, but was: $result",
@@ -487,7 +496,7 @@ class TimeInWordsTest5 {
             cal.set(Calendar.MINUTE, it)
             val date: Date = cal.time
 
-            val result = timeInWords(date, 5)
+            val result = timeInWords(context, date, 5)
 
             assertTrue(
                 "$it: Expected 'Elf Zwölftel' in the output, but was: $result",
