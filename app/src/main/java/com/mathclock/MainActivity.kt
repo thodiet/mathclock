@@ -44,7 +44,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.LinkAnnotation
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.TextLinkStyles
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import java.util.Calendar
 import androidx.compose.ui.unit.dp
@@ -261,6 +267,52 @@ private fun formatTime(date: Date): String {
 
 @Composable
 fun InfoScreen() {
+    val infoText = buildAnnotatedString {
+        append(
+            "Jesus Christus spricht:\n" +
+                    "Ich bin der Weg! Ich bin die Wahrheit und das Leben! " +
+                    "Zum Vater kommt man nur durch mich.\n"
+        )
+        withLink(
+            LinkAnnotation.Url(
+                url = "https://www.bibleserver.com/Ne%C3%9C/Johannes14%2C6",
+                styles = TextLinkStyles(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        textDecoration = TextDecoration.Underline
+                    )
+                )
+            )
+        ) { append("Joh. 14,6") }
+        append(
+            "\n\nDavid betet:\n" +
+                    "Meine Zeit steht in deinen Händen.\n"
+        )
+        withLink(
+            LinkAnnotation.Url(
+                url = "https://www.bibleserver.com/LUT/Psalm31%2C16",
+                styles = TextLinkStyles(
+                    style = SpanStyle(
+                        color = MaterialTheme.colorScheme.primary,
+                        textDecoration = TextDecoration.Underline
+                    )
+                )
+            )
+        ) { append("Ps. 31,16") }
+        append(
+            "\n\nVor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben " +
+                    "und Dreiviertel sieben und meint damit 6:15 bzw. 6:45.\n" +
+                    "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
+                    "habe ich diese App entwickelt.\n" +
+                    "Wer gerne auch mit kleineren Brüchen umgeht, kann die Granularität auf 5 Minuten verringern.\n" +
+                    "Mittels eines Widgets kann man sich die Anzeige " +
+                    "auch auf den Startbildschirm legen.\n" +
+                    "Wegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. " +
+                    "Das sollte sich nach 1-2 Minuten stabilisieren.\n\n" +
+                    "Alle Ehre dem Herrn Jesus Christus!",
+        )
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -273,23 +325,7 @@ fun InfoScreen() {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = "Jesus Christus spricht:\n" +
-                    "Ich bin der Weg und die Wahrheit und das Leben; " +
-                    "niemand kommt zum Vater denn durch mich.\n" +
-                    "Joh. 14,6\n\n" +
-                    "David betet:\n" +
-                    "Meine Zeit steht in deinen Händen.\n" +
-                    "Ps. 31,16\n\n" +
-                    "Vor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben " +
-                    "und Dreiviertel sieben und meint damit 6:15 bzw. 6:45.\n" +
-                    "Für alle, die Freude daran haben oder sich damit vertraut machen möchten, " +
-                    "habe ich diese App entwickelt.\n" +
-                    "Wer gerne auch mit kleineren Brüchen umgeht, kann die Granularität auf 5 Minuten verringern.\n" +
-                    "Mittels eines Widgets kann man sich die Anzeige " +
-                    "auch auf den Startbildschirm legen.\n" +
-                    "Wegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. " +
-                    "Das sollte sich nach 1-2 Minuten stabilisieren.\n\n" +
-                    "Alle Ehre dem Herrn Jesus Christus!",
+            text = infoText,
             style = MaterialTheme.typography.bodyLarge
         )
     }
@@ -301,6 +337,14 @@ fun InfoScreen() {
 fun DigitalClockPreview() {
     MathClockTheme {
         DigitalClock()
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InfoScreenPreview() {
+    MathClockTheme {
+        InfoScreen()
     }
 }
 
