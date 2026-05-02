@@ -1,5 +1,6 @@
 package com.mathclock
 
+import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -123,8 +124,9 @@ class MathClockWidget : GlanceAppWidget() {
         /**
          * Creates a context with a specific locale.
          */
+        @SuppressLint("AppBundleLocaleChanges")
         fun getLocalizedContext(context: Context, language: String): Context {
-            val locale = Locale(language)
+            val locale = Locale.forLanguageTag(language)
             Locale.setDefault(locale)
             val config = Configuration(context.resources.configuration)
             config.setLocale(locale)

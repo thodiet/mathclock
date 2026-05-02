@@ -12,7 +12,7 @@ android {
         minSdk = 24
         targetSdk = 37
         versionCode = 1
-        versionName = "1.4 (0)"
+        versionName = "1.4 (1)"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -33,6 +33,12 @@ android {
     }
     buildFeatures {
         compose = true
+    }
+
+    bundle {
+        language {
+            enableSplit = false
+        }
     }
 }
 

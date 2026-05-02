@@ -26,8 +26,8 @@ fun timeInWords(context: Context, date: Date, granularity: Int = 15): String {
         val minText = context.getString(minRes)
         if (offset < (granularity / 2.0)) {
             val hourPostfix : String
-            if (fraction == 0) hourPostfix = hour2word(context, displayHour)
-            else hourPostfix = hour2word(context, nextHour)
+            hourPostfix = if (fraction == 0) hour2word(context, displayHour)
+            else hour2word(context, nextHour)
             "$prefix ${number2word(context, offset)} $minText ${context.getString(R.string.time_after)}\n${fractionInText(context, fraction, granularity)} $hourPostfix"
         } else {
             "$prefix ${number2word(context, granularity - offset)} $minText ${context.getString(R.string.time_before)}\n${fractionInText(context, fraction + 1, granularity)} ${
