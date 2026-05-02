@@ -12,6 +12,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.intPreferencesKey
+import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.glance.GlanceId
@@ -45,6 +46,8 @@ import androidx.glance.text.TextStyle
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import java.util.Date
+import java.util.Locale
+import android.content.res.Configuration
 
 class MathClockWidget : GlanceAppWidget() {
 
@@ -61,8 +64,10 @@ class MathClockWidget : GlanceAppWidget() {
     companion object {
         const val INITIAL_TRANSPARENCY = 40f
         const val INITIAL_GRANULARITY = 15
+        const val DEFAULT_LANGUAGE = "de"
         val TransparencyKey = floatPreferencesKey("transparency")
         val GranularityKey = intPreferencesKey("granularity")
+        val LanguageKey = stringPreferencesKey("language")
         const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
 
         /**
@@ -106,6 +111,25 @@ class MathClockWidget : GlanceAppWidget() {
             Log.d("MathClockWidget", "updateGranularity called with: $granularity")
             updateWidgetPreference(context, GranularityKey, granularity)
         }
+
+        /**
+         * Updates the language for all widgets and triggers an immediate redraw.
+         */
+        suspend fun updateLanguage(context: Context, language: String) {
+            Log.d("MathClockWidget", "updateLanguage called with: $language")
+            updateWidgetPreference(context, LanguageKey, language)
+        }
+
+        /**
+         * Creates a context with a specific locale.
+         */
+        fun getLocalizedContext(context: Context, language: String): Context {
+            val locale = Locale(language)
+            Locale.setDefault(locale)
+            val config = Configuration(context.resources.configuration)
+            config.setLocale(locale)
+            return context.createConfigurationContext(config)
+        }
     }
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -114,20 +138,22 @@ class MathClockWidget : GlanceAppWidget() {
             val glancePrefs = currentState<Preferences>()
             val transparency = glancePrefs[TransparencyKey] ?: INITIAL_TRANSPARENCY
             val granularity = glancePrefs[GranularityKey] ?: INITIAL_GRANULARITY
+            val language = glancePrefs[LanguageKey] ?: DEFAULT_LANGUAGE
 
-            Log.d("MathClockWidget", "Rendering with transparency: $transparency, granularity: $granularity")
+            Log.d("MathClockWidget", "Rendering with transparency: $transparency, granularity: $granularity, lang: $language")
 
             GlanceTheme {
-                WidgetContent(context, transparency, granularity)
+                WidgetContent(context, transparency, granularity, language)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context, transparency: Float, granularity: Int) {
+    private fun WidgetContent(context: Context, transparency: Float, granularity: Int, language: String) {
         val now = Date()
         val size = LocalSize.current
-        val wordTime = timeInWords(context, now, granularity)
+        val localizedContext = getLocalizedContext(context, language)
+        val wordTime = timeInWords(localizedContext, now, granularity)
         Log.d(
             "MathClockWidget",
             "WidgetContent rendering at $now (Size: ${size.width}x${size.height}) with text: $wordTime"

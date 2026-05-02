@@ -22,7 +22,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,6 +33,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -79,6 +83,23 @@ class MainActivity : ComponentActivity() {
         setContent {
             MathClockTheme {
                 var currentScreen by remember { mutableStateOf(Screen.Clock) }
+                var language by remember { mutableStateOf(MathClockWidget.DEFAULT_LANGUAGE) }
+                val current = LocalContext.current
+
+                // Load initial language from Glance state
+                LaunchedEffect(Unit) {
+                    val manager = GlanceAppWidgetManager(current)
+                    val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
+                    if (glanceIds.isNotEmpty()) {
+                        val state = MathClockWidget().getAppWidgetState<Preferences>(
+                            current,
+                            glanceIds.first()
+                        )
+                        language = state[MathClockWidget.LanguageKey] ?: MathClockWidget.DEFAULT_LANGUAGE
+                    }
+                }
+
+                val localizedContext = MathClockWidget.getLocalizedContext(current, language)
 
                 BackHandler(enabled = currentScreen == Screen.Info) {
                     currentScreen = Screen.Clock
@@ -91,8 +112,8 @@ class MainActivity : ComponentActivity() {
                             title = {
                                 Text(
                                     when (currentScreen) {
-                                        Screen.Clock -> stringResource(R.string.settings_title)
-                                        Screen.Info -> stringResource(R.string.info_title)
+                                        Screen.Clock -> localizedContext.getString(R.string.settings_title)
+                                        Screen.Info -> localizedContext.getString(R.string.info_title)
                                     }
                                 )
                             },
@@ -101,7 +122,7 @@ class MainActivity : ComponentActivity() {
                                     IconButton(onClick = { currentScreen = Screen.Clock }) {
                                         Icon(
                                             Icons.AutoMirrored.Filled.ArrowBack,
-                                            contentDescription = stringResource(R.string.back_content_description)
+                                            contentDescription = localizedContext.getString(R.string.back_content_description)
                                         )
                                     }
                                 }
@@ -109,7 +130,7 @@ class MainActivity : ComponentActivity() {
                             actions = {
                                 if (currentScreen == Screen.Clock) {
                                     IconButton(onClick = { currentScreen = Screen.Info }) {
-                                        Icon(Icons.Default.Info, contentDescription = stringResource(R.string.info_title))
+                                        Icon(Icons.Default.Info, contentDescription = localizedContext.getString(R.string.info_title))
                                     }
                                 }
                             }
@@ -123,8 +144,8 @@ class MainActivity : ComponentActivity() {
                         contentAlignment = Alignment.Center
                     ) {
                         when (currentScreen) {
-                            Screen.Clock -> DigitalClock()
-                            Screen.Info -> InfoScreen()
+                            Screen.Clock -> DigitalClock(language) { language = it }
+                            Screen.Info -> InfoScreen(language)
                         }
                     }
                 }
@@ -133,8 +154,9 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DigitalClock() {
+fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
     val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
 
@@ -145,6 +167,8 @@ fun DigitalClock() {
     var granularity by remember {
         mutableIntStateOf(MathClockWidget.INITIAL_GRANULARITY)
     }
+
+    var expanded by remember { mutableStateOf(false) }
 
     // Load initial values from Glance state
     LaunchedEffect(Unit) {
@@ -162,6 +186,8 @@ fun DigitalClock() {
         }
     }
 
+    val localizedContext = MathClockWidget.getLocalizedContext(current, currentLanguage)
+
     // Update the time every second
     LaunchedEffect(Unit) {
         while (true) {
@@ -176,7 +202,7 @@ fun DigitalClock() {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = stringResource(R.string.transparency_label, transparency.roundToInt()),
+            text = localizedContext.getString(R.string.transparency_label, transparency.roundToInt()),
             style = MaterialTheme.typography.bodyLarge
         )
         Slider(
@@ -195,7 +221,7 @@ fun DigitalClock() {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = stringResource(R.string.granularity_label),
+            text = localizedContext.getString(R.string.granularity_label),
             style = MaterialTheme.typography.bodyLarge
         )
 
@@ -203,8 +229,8 @@ fun DigitalClock() {
 
         val radioOptions = listOf(15, 5)
         val radioLabels = listOf(
-            stringResource(R.string.granularity_15),
-            stringResource(R.string.granularity_5)
+            localizedContext.getString(R.string.granularity_15),
+            localizedContext.getString(R.string.granularity_5)
         )
 
         Row(
@@ -245,6 +271,55 @@ fun DigitalClock() {
             }
         }
 
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Text(
+            text = "Sprache / Dialekt:",
+            style = MaterialTheme.typography.bodyLarge
+        )
+
+        Spacer(modifier = Modifier.height(8.dp))
+
+        val langOptions = listOf("de", "swg")
+        val langLabels = listOf("Deutsch", "Schwäbisch")
+        val selectedLabel = langLabels[langOptions.indexOf(currentLanguage)]
+
+        ExposedDropdownMenuBox(
+            expanded = expanded,
+            onExpandedChange = { expanded = !expanded },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
+        ) {
+            TextField(
+                value = selectedLabel,
+                onValueChange = {},
+                readOnly = true,
+                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                modifier = Modifier.menuAnchor().fillMaxWidth()
+            )
+
+            ExposedDropdownMenu(
+                expanded = expanded,
+                onDismissRequest = { expanded = false }
+            ) {
+                langOptions.forEachIndexed { index, option ->
+                    DropdownMenuItem(
+                        text = { Text(text = langLabels[index]) },
+                        onClick = {
+                            onLanguageChange(option)
+                            MainScope().launch {
+                                MathClockWidget.updateLanguage(
+                                    current.applicationContext,
+                                    option
+                                )
+                            }
+                            expanded = false
+                        }
+                    )
+                }
+            }
+        }
+
         Column(
             modifier = Modifier.weight(1f),
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -256,7 +331,7 @@ fun DigitalClock() {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = timeInWords(current, currentDate, granularity),
+                text = timeInWords(localizedContext, currentDate, granularity),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
@@ -270,10 +345,11 @@ private fun formatTime(date: Date): String {
 }
 
 @Composable
-fun InfoScreen() {
-    val context = LocalContext.current
+fun InfoScreen(language: String) {
+    val current = LocalContext.current
+    val localizedContext = MathClockWidget.getLocalizedContext(current, language)
     val infoText = buildAnnotatedString {
-        append(stringResource(R.string.info_jesus_christ))
+        append(localizedContext.getString(R.string.info_jesus_christ))
         withLink(
             LinkAnnotation.Url(
                 url = "https://www.bibleserver.com/Ne%C3%9C/Johannes14%2C6",
@@ -284,8 +360,8 @@ fun InfoScreen() {
                     )
                 )
             )
-        ) { append(stringResource(R.string.info_john_14_6)) }
-        append(stringResource(R.string.info_david_pray))
+        ) { append(localizedContext.getString(R.string.info_john_14_6)) }
+        append(localizedContext.getString(R.string.info_david_pray))
         withLink(
             LinkAnnotation.Url(
                 url = "https://www.bibleserver.com/LUT/Psalm31%2C16",
@@ -296,8 +372,8 @@ fun InfoScreen() {
                     )
                 )
             )
-        ) { append(stringResource(R.string.info_psalm_31_16)) }
-        append(stringResource(R.string.info_explanation))
+        ) { append(localizedContext.getString(R.string.info_psalm_31_16)) }
+        append(localizedContext.getString(R.string.info_explanation))
     }
 
     Column(
@@ -307,7 +383,7 @@ fun InfoScreen() {
         horizontalAlignment = Alignment.Start
     ) {
         Text(
-            text = stringResource(R.string.welcome_title),
+            text = localizedContext.getString(R.string.welcome_title),
             style = MaterialTheme.typography.headlineMedium
         )
         Spacer(modifier = Modifier.height(16.dp))
@@ -323,7 +399,7 @@ fun InfoScreen() {
 @Composable
 fun DigitalClockPreview() {
     MathClockTheme {
-        DigitalClock()
+        DigitalClock("de") {}
     }
 }
 
@@ -331,7 +407,7 @@ fun DigitalClockPreview() {
 @Composable
 fun InfoScreenPreview() {
     MathClockTheme {
-        InfoScreen()
+        InfoScreen("de")
     }
 }
 
