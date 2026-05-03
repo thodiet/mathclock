@@ -1,9 +1,9 @@
 <resources>
-    <string name="info_explanation">\n\nScho gwisst? Bei ons im Schwobaländle sagt ma gern Viertel sieba ond Dreiviertel sieba. Des hoißt dann 6:15 oder 6:45.\nI han die App gmacht für älle, wo des au so möget.\nWer’s no genauer habbe will, kann au uff 5 Minuta umschalta.\nMit em Widget kosch dr des au uff da Startbildschirm lega.\nWeil Android des so will, koh’s am Ofang a bissle dauera, bis d’Zeit stemmt. Des legt sich aber glei.</string>
+    <string name="info_explanation">\n\nScho gwisst? Bei ons im Schwobaländle sagt ma gern Viertel sieba ond Dreiviertel sieba. Des hoißt dann 6:15 oder 6:45.\nI han die App gmacht für älle, wo des au so möget.\nWer’s no gnauer habbe will, kann au uff 5 Minuta umschalta.\nMit em Widget kosch dr des au uff da Startbildschirm lega.\nWeil Android des so will, koh’s am Ofang a bissle dauera, bis d’Zeit stemmt. Des legt sich aber glei.</string>
 
     <!-- Time Words -->
     <string name="time_prefix">\'s isch</string>
-    <string name="time_suffix_o_clock"></string>
+    <string name="time_suffix_o_clock" />
     <string name="time_minute">Minut</string>
     <string name="time_minutes">Minuta</string>
     <string name="time_after">noch</string>
@@ -24,19 +24,12 @@
 
     <!-- Numbers -->
     <string name="num_1">oi</string>
-    <string name="num_1_masc">oi</string>
-    <string name="num_1_neut">ois</string>
     <string name="num_2">zwoi</string>
     <string name="num_3">drei</string>
     <string name="num_4">vier</string>
     <string name="num_5">fenf</string>
     <string name="num_6">sechs</string>
     <string name="num_7">sieba</string>
-    <string name="num_8">achte</string>
-    <string name="num_9">neune</string>
-    <string name="num_10">zehne</string>
-    <string name="num_11">elfe</string>
-    <string name="num_12">zwölfe</string>
 
     <!-- Hours -->
     <string name="hour_1">oins</string>

@@ -8,7 +8,8 @@ import java.util.Date
  * Converts a time into words with fractions of hours.
  */
 fun timeInWords(context: Context, date: Date, granularity: Int = 15): String {
-    val cal = Calendar.getInstance().apply { time = date }
+    val locale = context.resources.configuration.locales[0]
+    val cal = Calendar.getInstance(locale).apply { time = date }
     val hour = cal.get(Calendar.HOUR) // 0-11
     val displayHour = if (hour == 0) 12 else hour
     val nextHour = if (displayHour == 12) 1 else displayHour + 1
@@ -25,8 +26,7 @@ fun timeInWords(context: Context, date: Date, granularity: Int = 15): String {
         val minRes = if (offset == 1 || (granularity - offset) == 1) R.string.time_minute else R.string.time_minutes
         val minText = context.getString(minRes)
         if (offset < (granularity / 2.0)) {
-            val hourPostfix : String
-            hourPostfix = if (fraction == 0) hour2word(context, displayHour)
+            val hourPostfix = if (fraction == 0) hour2word(context, displayHour)
             else hour2word(context, nextHour)
             "$prefix ${number2word(context, offset)} $minText ${context.getString(R.string.time_after)}\n${fractionInText(context, fraction, granularity)} $hourPostfix"
         } else {

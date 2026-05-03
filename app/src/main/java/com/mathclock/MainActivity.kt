@@ -340,7 +340,7 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = formatTime(currentDate),
+                text = formatTime(currentDate, localizedContext.resources.configuration.locales[0]),
                 style = MaterialTheme.typography.displayLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -353,8 +353,8 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
     }
 }
 
-private fun formatTime(date: Date): String {
-    val sdf = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
+private fun formatTime(date: Date, locale: Locale): String {
+    val sdf = SimpleDateFormat("HH:mm:ss", locale)
     return sdf.format(date)
 }
 
