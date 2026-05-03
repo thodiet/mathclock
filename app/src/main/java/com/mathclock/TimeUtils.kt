@@ -72,7 +72,7 @@ private fun fractionInText(context: Context, fraction: Int, granularity: Int = 1
  */
 private fun number2word(context: Context, number: Int): String {
     val resId = when (number) {
-        1 -> R.string.num_1_fem
+        1 -> R.string.num_1
         2 -> R.string.num_2
         3 -> R.string.num_3
         4 -> R.string.num_4
@@ -89,18 +89,18 @@ private fun number2word(context: Context, number: Int): String {
  */
 private fun hour2word(context: Context, number: Int, extended: Boolean = false): String {
     val resId = when (number) {
-        1 -> if (extended) R.string.num_1_masc else R.string.num_1_neut
-        2 -> R.string.num_2
-        3 -> R.string.num_3
-        4 -> R.string.num_4
-        5 -> R.string.num_5
-        6 -> R.string.num_6
-        7 -> R.string.num_7
-        8 -> R.string.num_8
-        9 -> R.string.num_9
-        10 -> R.string.num_10
-        11 -> R.string.num_11
-        12 -> R.string.num_12
+        1 -> if (extended) R.string.hour_1_masc else R.string.hour_1
+        2 -> R.string.hour_2
+        3 -> R.string.hour_3
+        4 -> R.string.hour_4
+        5 -> R.string.hour_5
+        6 -> R.string.hour_6
+        7 -> R.string.hour_7
+        8 -> R.string.hour_8
+        9 -> R.string.hour_9
+        10 -> R.string.hour_10
+        11 -> R.string.hour_11
+        12 -> R.string.hour_12
         else -> 0
     }
     val hour = if (resId != 0) context.getString(resId) else ""

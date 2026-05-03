@@ -95,7 +95,8 @@ class MainActivity : ComponentActivity() {
                             current,
                             glanceIds.first()
                         )
-                        language = state[MathClockWidget.LanguageKey] ?: MathClockWidget.DEFAULT_LANGUAGE
+                        language =
+                            state[MathClockWidget.LanguageKey] ?: MathClockWidget.DEFAULT_LANGUAGE
                     }
                 }
 
@@ -130,7 +131,10 @@ class MainActivity : ComponentActivity() {
                             actions = {
                                 if (currentScreen == Screen.Clock) {
                                     IconButton(onClick = { currentScreen = Screen.Info }) {
-                                        Icon(Icons.Default.Info, contentDescription = localizedContext.getString(R.string.info_title))
+                                        Icon(
+                                            Icons.Default.Info,
+                                            contentDescription = localizedContext.getString(R.string.info_title)
+                                        )
                                     }
                                 }
                             }
@@ -202,7 +206,10 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            text = localizedContext.getString(R.string.transparency_label, transparency.roundToInt()),
+            text = localizedContext.getString(
+                R.string.transparency_label,
+                transparency.roundToInt()
+            ),
             style = MaterialTheme.typography.bodyLarge
         )
         Slider(
@@ -287,7 +294,9 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
         ExposedDropdownMenuBox(
             expanded = expanded,
             onExpandedChange = { expanded = !expanded },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 32.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
         ) {
             TextField(
                 value = selectedLabel,
@@ -295,7 +304,12 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
                 readOnly = true,
                 trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
                 colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier.menuAnchor(ExposedDropdownMenuAnchorType.PrimaryNotEditable, true).fillMaxWidth()
+                modifier = Modifier
+                    .menuAnchor(
+                        ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                        true
+                    )
+                    .fillMaxWidth()
             )
 
             ExposedDropdownMenu(
@@ -374,6 +388,7 @@ fun InfoScreen(language: String) {
             )
         ) { append(localizedContext.getString(R.string.info_psalm_31_16)) }
         append(localizedContext.getString(R.string.info_explanation))
+        append(localizedContext.getString(R.string.info_honor_to_jesus))
     }
 
     Column(
@@ -424,8 +439,10 @@ fun TimeInWordsTestPreview() {
         set(Calendar.SECOND, 0)
     }
 
-    val testZeiten = listOf(0, 1, 7, 8, 14, 15, 16, 22, 23, 29, 30, 31,
-        37, 38, 44, 45, 46, 52, 53, 59).map { mins ->
+    val testZeiten = listOf(
+        0, 1, 7, 8, 14, 15, 16, 22, 23, 29, 30, 31,
+        37, 38, 44, 45, 46, 52, 53, 59
+    ).map { mins ->
         val cal = baseCal.clone() as Calendar
         cal.set(Calendar.MINUTE, mins)
         cal.time

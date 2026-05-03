@@ -14,7 +14,8 @@
     <string name="info_john_14_6">Joh. 14,6</string>
     <string name="info_david_pray">\n\nDavid betet:\nMeine Zeit steht in deinen Händen.\n</string>
     <string name="info_psalm_31_16">Ps. 31,16</string>
-    <string name="info_explanation">\n\nVor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben und Dreiviertel sieben und meint damit 6:15 bzw. 6:45.\nFür alle, die Freude daran haben oder sich damit vertraut machen möchten, habe ich diese App entwickelt.\nWer gerne auch mit kleineren Brüchen umgeht, kann die Granularität auf 5 Minuten verringern.\nMittels eines Widgets kann man sich die Anzeige auch auf den Startbildschirm legen.\nWegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. Das sollte sich nach 1-2 Minuten stabilisieren.\n\nAlle Ehre dem Herrn Jesus Christus!</string>
+    <string name="info_explanation">\n\nVor allem im Süden Deutschlands kennt man die Ausdrücke Viertel sieben und Dreiviertel sieben und meint damit 6:15 bzw. 6:45.\nFür alle, die Freude daran haben oder sich damit vertraut machen möchten, habe ich diese App entwickelt.\nWer gerne auch mit kleineren Brüchen umgeht, kann die Granularität auf 5 Minuten verringern.\nMittels eines Widgets kann man sich die Anzeige auch auf den Startbildschirm legen.\nWegen Android-Limitierungen bei Widgets kann es sein, dass die Zeitangabe initial nachgeht. Das sollte sich nach 1-2 Minuten stabilisieren.</string>
+    <string name="info_honor_to_jesus">\n\nAlle Ehre dem Herrn Jesus Christus!</string>
 
     <!-- Time Words -->
     <string name="time_prefix">Es ist</string>
@@ -37,10 +38,8 @@
     <string name="fraction_five_sixths">Fünf Sechstel</string>
     <string name="fraction_eleven_twelfths">Elf Zwölftel</string>
 
-    <!-- Numbers/Hours -->
-    <string name="num_1_fem">eine</string>
-    <string name="num_1_masc">ein</string>
-    <string name="num_1_neut">eins</string>
+    <!-- Numbers -->
+    <string name="num_1">eine</string>
     <string name="num_2">zwei</string>
     <string name="num_3">drei</string>
     <string name="num_4">vier</string>
@@ -52,4 +51,19 @@
     <string name="num_10">zehn</string>
     <string name="num_11">elf</string>
     <string name="num_12">zwölf</string>
+
+    <!-- Hours -->
+    <string name="hour_1">eins</string>
+    <string name="hour_1_masc">ein</string>
+    <string name="hour_2">zwei</string>
+    <string name="hour_3">drei</string>
+    <string name="hour_4">vier</string>
+    <string name="hour_5">fünf</string>
+    <string name="hour_6">sechs</string>
+    <string name="hour_7">sieben</string>
+    <string name="hour_8">acht</string>
+    <string name="hour_9">neun</string>
+    <string name="hour_10">zehn</string>
+    <string name="hour_11">elf</string>
+    <string name="hour_12">zwölf</string>
 </resources>
