@@ -1,0 +1,38 @@
+<resources>
+    <!-- Fractions -->
+    <string name="fraction_quarter">1/4</string>
+    <string name="fraction_half">1/2</string>
+    <string name="fraction_three_quarters">3/4</string>
+    <string name="fraction_twelfth">1/12</string>
+    <string name="fraction_sixth">1/6</string>
+    <string name="fraction_third">1/3</string>
+    <string name="fraction_five_twelfths">5/12</string>
+    <string name="fraction_seven_twelfths">7/12</string>
+    <string name="fraction_two_thirds">2/3</string>
+    <string name="fraction_five_sixths">5/6</string>
+    <string name="fraction_eleven_twelfths">11/12</string>
+
+    <!-- Numbers -->
+    <string name="num_1">1</string>
+    <string name="num_2">2</string>
+    <string name="num_3">3</string>
+    <string name="num_4">4</string>
+    <string name="num_5">5</string>
+    <string name="num_6">6</string>
+    <string name="num_7">7</string>
+
+    <!-- Hours -->
+    <string name="hour_1">1</string>
+    <string name="hour_1_masc">1</string>
+    <string name="hour_2">2</string>
+    <string name="hour_3">3</string>
+    <string name="hour_4">4</string>
+    <string name="hour_5">5</string>
+    <string name="hour_6">6</string>
+    <string name="hour_7">7</string>
+    <string name="hour_8">8</string>
+    <string name="hour_9">9</string>
+    <string name="hour_10">10</string>
+    <string name="hour_11">11</string>
+    <string name="hour_12">12</string>
+</resources>

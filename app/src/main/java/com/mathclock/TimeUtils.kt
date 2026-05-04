@@ -7,7 +7,7 @@ import java.util.Date
 /**
  * Converts a time into words with fractions of hours.
  */
-fun timeInWords(context: Context, date: Date, granularity: Int = 15): String {
+fun timeInWords(context: Context, date: Date, granularity: Int = 15, style: String = "de"): String {
     val locale = context.resources.configuration.locales[0]
     val cal = Calendar.getInstance(locale).apply { time = date }
     val hour = cal.get(Calendar.HOUR) // 0-11

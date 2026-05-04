@@ -83,10 +83,10 @@ class MainActivity : ComponentActivity() {
         setContent {
             MathClockTheme {
                 var currentScreen by remember { mutableStateOf(Screen.Clock) }
-                var language by remember { mutableStateOf(MathClockWidget.DEFAULT_LANGUAGE) }
+                var style by remember { mutableStateOf(MathClockWidget.DEFAULT_STYLE) }
                 val current = LocalContext.current
 
-                // Load initial language from Glance state
+                // Load initial style from Glance state
                 LaunchedEffect(Unit) {
                     val manager = GlanceAppWidgetManager(current)
                     val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
@@ -95,12 +95,12 @@ class MainActivity : ComponentActivity() {
                             current,
                             glanceIds.first()
                         )
-                        language =
-                            state[MathClockWidget.LanguageKey] ?: MathClockWidget.DEFAULT_LANGUAGE
+                        style =
+                            state[MathClockWidget.StyleKey] ?: MathClockWidget.DEFAULT_STYLE
                     }
                 }
 
-                val localizedContext = MathClockWidget.getLocalizedContext(current, language)
+                val localizedContext = MathClockWidget.getLocalizedContext(current, style)
 
                 BackHandler(enabled = currentScreen == Screen.Info) {
                     currentScreen = Screen.Clock
@@ -148,8 +148,8 @@ class MainActivity : ComponentActivity() {
                         contentAlignment = Alignment.Center
                     ) {
                         when (currentScreen) {
-                            Screen.Clock -> DigitalClock(language) { language = it }
-                            Screen.Info -> InfoScreen(language)
+                            Screen.Clock -> DigitalClock(style) { style = it }
+                            Screen.Info -> InfoScreen(style)
                         }
                     }
                 }
@@ -160,7 +160,7 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
+fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
     val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
 
@@ -190,7 +190,7 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
         }
     }
 
-    val localizedContext = MathClockWidget.getLocalizedContext(current, currentLanguage)
+    val localizedContext = MathClockWidget.getLocalizedContext(current, currentStyle)
 
     // Update the time every second
     LaunchedEffect(Unit) {
@@ -281,15 +281,15 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(
-            text = "Sprache / Dialekt:",
+            text = "Stil:",
             style = MaterialTheme.typography.bodyLarge
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
-        val langOptions = listOf("de", "swg")
-        val langLabels = listOf("Deutsch", "Schwäbisch")
-        val selectedLabel = langLabels[langOptions.indexOf(currentLanguage)]
+        val styleOptions = listOf("de", "mth", "swg")
+        val styleLabels = listOf("Deutsch", "Mathematisch", "Schwäbisch")
+        val selectedLabel = styleLabels[styleOptions.indexOf(currentStyle)]
 
         ExposedDropdownMenuBox(
             expanded = expanded,
@@ -316,13 +316,13 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
                 expanded = expanded,
                 onDismissRequest = { expanded = false }
             ) {
-                langOptions.forEachIndexed { index, option ->
+                styleOptions.forEachIndexed { index, option ->
                     DropdownMenuItem(
-                        text = { Text(text = langLabels[index]) },
+                        text = { Text(text = styleLabels[index]) },
                         onClick = {
-                            onLanguageChange(option)
+                            onStyleChange(option)
                             MainScope().launch {
-                                MathClockWidget.updateLanguage(
+                                MathClockWidget.updateStyle(
                                     current.applicationContext,
                                     option
                                 )
@@ -345,7 +345,7 @@ fun DigitalClock(currentLanguage: String, onLanguageChange: (String) -> Unit) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = timeInWords(localizedContext, currentDate, granularity),
+                text = timeInWords(localizedContext, currentDate, granularity, currentStyle),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
@@ -359,9 +359,9 @@ private fun formatTime(date: Date, locale: Locale): String {
 }
 
 @Composable
-fun InfoScreen(language: String) {
+fun InfoScreen(style: String) {
     val current = LocalContext.current
-    val localizedContext = MathClockWidget.getLocalizedContext(current, language)
+    val localizedContext = MathClockWidget.getLocalizedContext(current, style)
     val infoText = buildAnnotatedString {
         append(localizedContext.getString(R.string.info_jesus_christ))
         withLink(
