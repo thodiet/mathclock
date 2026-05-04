@@ -202,7 +202,7 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
+            .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
@@ -278,58 +278,68 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
             }
         }
 
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
 
-        Text(
-            text = "Stil:",
-            style = MaterialTheme.typography.bodyLarge
-        )
-
-        Spacer(modifier = Modifier.height(8.dp))
-
-        val styleOptions = listOf("de", "mth", "swg")
-        val styleLabels = listOf("Deutsch", "Mathematisch", "Schwäbisch")
-        val selectedLabel = styleLabels[styleOptions.indexOf(currentStyle)]
-
-        ExposedDropdownMenuBox(
-            expanded = expanded,
-            onExpandedChange = { expanded = !expanded },
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 32.dp)
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
         ) {
-            TextField(
-                value = selectedLabel,
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                colors = ExposedDropdownMenuDefaults.textFieldColors(),
-                modifier = Modifier
-                    .menuAnchor(
-                        ExposedDropdownMenuAnchorType.PrimaryNotEditable,
-                        true
-                    )
-                    .fillMaxWidth()
+            Text(
+                text = "Stil:",
+                style = MaterialTheme.typography.bodyLarge
             )
 
-            ExposedDropdownMenu(
+            Spacer(modifier = Modifier.width(16.dp))
+
+            val styleOptions = listOf("de", "mth", "swg")
+            val styleLabels = listOf("Deutsch", "Mathematisch", "Schwäbisch")
+            val selectedLabel = styleLabels[styleOptions.indexOf(currentStyle).coerceAtLeast(0)]
+
+            ExposedDropdownMenuBox(
                 expanded = expanded,
-                onDismissRequest = { expanded = false }
+                onExpandedChange = { expanded = !expanded },
+                modifier = Modifier.width(250.dp)
             ) {
-                styleOptions.forEachIndexed { index, option ->
-                    DropdownMenuItem(
-                        text = { Text(text = styleLabels[index]) },
-                        onClick = {
-                            onStyleChange(option)
-                            MainScope().launch {
-                                MathClockWidget.updateStyle(
-                                    current.applicationContext,
-                                    option
+                TextField(
+                    value = selectedLabel,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .menuAnchor(
+                            ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                            true
+                        )
+                        .height(48.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = expanded,
+                    onDismissRequest = { expanded = false }
+                ) {
+                    styleOptions.forEachIndexed { index, option ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = styleLabels[index],
+                                    style = MaterialTheme.typography.bodyMedium
                                 )
+                            },
+                            onClick = {
+                                onStyleChange(option)
+                                MainScope().launch {
+                                    MathClockWidget.updateStyle(
+                                        current.applicationContext,
+                                        option
+                                    )
+                                }
+                                expanded = false
                             }
-                            expanded = false
-                        }
-                    )
+                        )
+                    }
                 }
             }
         }
