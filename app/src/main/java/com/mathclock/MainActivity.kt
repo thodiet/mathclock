@@ -355,7 +355,7 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = timeInWords(localizedContext, currentDate, granularity, currentStyle),
+                text = timeInWords(localizedContext, currentDate, granularity),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center
             )
