@@ -1,5 +1,6 @@
 package com.mathclock
 
+import android.content.Context
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import org.junit.Assert.assertTrue
@@ -10,502 +11,281 @@ import java.util.Date
 
 @RunWith(AndroidJUnit4::class)
 class TimeInWordsTest {
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
+
+    private val baseContext = InstrumentationRegistry.getInstrumentation().targetContext
+    private val styles = listOf("de", "mth", "swg")
+
+    private fun getContext(style: String): Context = MathClockWidget.getLocalizedContext(baseContext, style)
 
     @Test
     fun test_0() {
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.MINUTE, 0)
-        val date: Date = cal.time
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            cal.set(Calendar.MINUTE, 0)
+            val date: Date = cal.time
 
-        val result = timeInWords(context, date)
+            // Check 15-minute granularity
+            val result15 = timeInWords(context, date, 15)
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
 
-        assertTrue(
-            "0: Expected 'Uhr' in the output, but was: $result",
-            result.contains("Uhr")
-        )
-        assertTrue(
-            "0: Expected no 'vor' in the output, but was: $result",
-            !result.contains("vor")
-        )
-        assertTrue(
-            "0: Expected no 'nach' in the output, but was: $result",
-            !result.contains("nach")
-        )
+            if (oClockSuffix.isNotEmpty()) {
+                assertTrue(
+                    "$style - 0 (15min): Expected '$oClockSuffix' in the output, but was: $result15",
+                    result15.contains(oClockSuffix)
+                )
+            }
+            assertTrue(
+                "$style - 0 (15min): Expected no '${context.getString(R.string.time_before)}' in the output, but was: $result15",
+                !result15.contains(context.getString(R.string.time_before))
+            )
+            assertTrue(
+                "$style - 0 (15min): Expected no '${context.getString(R.string.time_after)}' in the output, but was: $result15",
+                !result15.contains(context.getString(R.string.time_after))
+            )
+
+            // Check 5-minute granularity
+            val result5 = timeInWords(context, date, 5)
+            if (oClockSuffix.isNotEmpty()) {
+                assertTrue(
+                    "$style - 0 (5min): Expected '$oClockSuffix' in the output, but was: $result5",
+                    result5.contains(oClockSuffix)
+                )
+            }
+            assertTrue(
+                "$style - 0 (5min): Expected no '${context.getString(R.string.time_before)}' in the output, but was: $result5",
+                !result5.contains(context.getString(R.string.time_before))
+            )
+            assertTrue(
+                "$style - 0 (5min): Expected no '${context.getString(R.string.time_after)}' in the output, but was: $result5",
+                !result5.contains(context.getString(R.string.time_after))
+            )
+        }
     }
 
     @Test
     fun test_vor() {
-        val cal = Calendar.getInstance()
-        val minutes = (8..14) + (23..29) + (38..44) + (53..59)
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            val minutes = (8..14) + (23..29) + (38..44) + (53..59)
+            val beforeWord = context.getString(R.string.time_before)
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
 
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
+            minutes.forEach {
+                cal.set(Calendar.MINUTE, it)
+                val result = timeInWords(context, cal.time)
 
-            val result = timeInWords(context, date)
-
-            assertTrue(
-                "$it: Expected 'vor' in the output, but was: $result",
-                result.contains("vor")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
+                assertTrue(
+                    "$style - $it: Expected '$beforeWord' in the output, but was: $result",
+                    result.contains(beforeWord)
+                )
+                if (oClockSuffix.isNotEmpty()) {
+                    assertTrue(
+                        "$style - $it: Expected no '$oClockSuffix' in the output, but was: $result",
+                        !result.contains(oClockSuffix)
+                    )
+                }
+            }
         }
     }
 
     @Test
     fun test_nach() {
-        val cal = Calendar.getInstance()
-        val minutes = (1..7) + (16..22) + (31..37) + (46..52)
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            val minutes = (1..7) + (16..22) + (31..37) + (46..52)
+            val afterWord = context.getString(R.string.time_after)
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
 
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
+            minutes.forEach {
+                cal.set(Calendar.MINUTE, it)
+                val result = timeInWords(context, cal.time)
 
-            val result = timeInWords(context, date)
-
-            assertTrue(
-                "$it: Expected 'nach' in the output, but was: $result",
-                result.contains("nach")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun testNeitherNor_vor_nach() {
-        val cal = Calendar.getInstance()
-        val minutes = arrayOf(15, 30, 45)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date)
-
-            assertTrue(
-                "$it: Expected no 'vor' in the output, but was: $result",
-                !result.contains("vor")
-            )
-            assertTrue(
-                "$it: Expected no 'nach' in the output, but was: $result",
-                !result.contains("nach")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
+                assertTrue(
+                    "$style - $it: Expected '$afterWord' in the output, but was: $result",
+                    result.contains(afterWord)
+                )
+                if (oClockSuffix.isNotEmpty()) {
+                    assertTrue(
+                        "$style - $it: Expected no '$oClockSuffix' in the output, but was: $result",
+                        !result.contains(oClockSuffix)
+                    )
+                }
+            }
         }
     }
 
     @Test
     fun test_Viertel() {
-        val cal = Calendar.getInstance()
-        val minutes = (8..22)
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            val minutes = (8..22)
+            val quarterWord = context.getString(R.string.fraction_quarter)
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
 
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
+            minutes.forEach {
+                cal.set(Calendar.MINUTE, it)
+                val result = timeInWords(context, cal.time)
 
-            val result = timeInWords(context, date)
-
-            assertTrue(
-                "$it: Expected 'Viertel' in the output, but was: $result",
-                result.contains("Viertel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
+                assertTrue(
+                    "$style - $it: Expected '$quarterWord' in the output, but was: $result",
+                    result.contains(quarterWord)
+                )
+                if (oClockSuffix.isNotEmpty()) {
+                    assertTrue(
+                        "$style - $it: Expected no '$oClockSuffix' in the output, but was: $result",
+                        !result.contains(oClockSuffix)
+                    )
+                }
+            }
         }
     }
 
     @Test
     fun test_Halb() {
-        val cal = Calendar.getInstance()
-        val minutes = (23..37)
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            val minutes = (23..37)
+            val halfWord = context.getString(R.string.fraction_half)
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
 
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
+            minutes.forEach {
+                cal.set(Calendar.MINUTE, it)
+                val result = timeInWords(context, cal.time)
 
-            val result = timeInWords(context, date)
-
-            assertTrue(
-                "$it: Expected 'Halb' in the output, but was: $result",
-                result.contains("Halb")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
+                assertTrue(
+                    "$style - $it: Expected '$halfWord' in the output, but was: $result",
+                    result.contains(halfWord)
+                )
+                if (oClockSuffix.isNotEmpty()) {
+                    assertTrue(
+                        "$style - $it: Expected no '$oClockSuffix' in the output, but was: $result",
+                        !result.contains(oClockSuffix)
+                    )
+                }
+            }
         }
     }
 
     @Test
     fun test_Dreiviertel() {
-        val cal = Calendar.getInstance()
-        val minutes = (38..52)
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            val minutes = (38..52)
+            val threeQuartersWord = context.getString(R.string.fraction_three_quarters)
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
 
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
+            minutes.forEach {
+                cal.set(Calendar.MINUTE, it)
+                val result = timeInWords(context, cal.time)
 
-            val result = timeInWords(context, date)
-
-            assertTrue(
-                "$it: Expected 'Dreiviertel' in the output, but was: $result",
-                result.contains("Dreiviertel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-}
-
-@RunWith(AndroidJUnit4::class)
-class TimeInWordsTest5 {
-    private val context = InstrumentationRegistry.getInstrumentation().targetContext
-
-    @Test
-    fun test_0() {
-        val cal = Calendar.getInstance()
-        cal.set(Calendar.MINUTE, 0)
-        val date: Date = cal.time
-
-        val result = timeInWords(context, date, 5)
-
-        assertTrue(
-            "0: Expected 'Uhr' in the output, but was: $result",
-            result.contains("Uhr")
-        )
-        assertTrue(
-            "0: Expected no 'vor' in the output, but was: $result",
-            !result.contains("vor")
-        )
-        assertTrue(
-            "0: Expected no 'nach' in the output, but was: $result",
-            !result.contains("nach")
-        )
-    }
-
-    @Test
-    fun test_vor() {
-        val cal = Calendar.getInstance()
-        val minutes = arrayOf(3, 4, 8, 9, 13, 14, 18, 19, 23, 24, 28, 29, 33, 34, 38, 39, 43, 44, 48, 49, 53, 54, 58, 59)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'vor' in the output, but was: $result",
-                result.contains("vor")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_nach() {
-        val cal = Calendar.getInstance()
-        val minutes = arrayOf(1, 2, 6, 7, 11, 12, 16, 17, 21, 22, 26, 27, 31, 32, 36, 37, 41, 42, 46, 47, 51, 52, 56, 57)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'nach' in the output, but was: $result",
-                result.contains("nach")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
+                assertTrue(
+                    "$style - $it: Expected '$threeQuartersWord' in the output, but was: $result",
+                    result.contains(threeQuartersWord)
+                )
+                if (oClockSuffix.isNotEmpty()) {
+                    assertTrue(
+                        "$style - $it: Expected no '$oClockSuffix' in the output, but was: $result",
+                        !result.contains(oClockSuffix)
+                    )
+                }
+            }
         }
     }
 
     @Test
     fun testNeitherNor_vor_nach() {
-        val cal = Calendar.getInstance()
-        val minutes = arrayOf(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55)
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
+            // 15-Minuten-Granularität
+            val minutes15 = arrayOf(15, 30, 45)
+            minutes15.forEach { minute ->
+                cal.set(Calendar.MINUTE, minute)
+                val result = timeInWords(context, cal.time, 15)
+                assertTrue(
+                    "$style - $minute (15min): Expected no '${context.getString(R.string.time_before)}'",
+                    !result.contains(context.getString(R.string.time_before))
+                )
+                assertTrue(
+                    "$style - $minute (15min): Expected no '${context.getString(R.string.time_after)}'",
+                    !result.contains(context.getString(R.string.time_after))
+                )
+                if (oClockSuffix.isNotEmpty()) {
+                    assertTrue(
+                        "$style - $minute (15min): Expected no '$oClockSuffix'",
+                        !result.contains(oClockSuffix)
+                    )
+                }
+            }
 
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected no 'vor' in the output, but was: $result",
-                !result.contains("vor")
-            )
-            assertTrue(
-                "$it: Expected no 'nach' in the output, but was: $result",
-                !result.contains("nach")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
+            // 5-Minuten-Granularität
+            val minutes5 = arrayOf(5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55)
+            minutes5.forEach { minute ->
+                cal.set(Calendar.MINUTE, minute)
+                val result = timeInWords(context, cal.time, 5)
+                assertTrue(
+                    "$style - $minute (5min): Expected no '${context.getString(R.string.time_before)}'",
+                    !result.contains(context.getString(R.string.time_before))
+                )
+                assertTrue(
+                    "$style - $minute (5min): Expected no '${context.getString(R.string.time_after)}'",
+                    !result.contains(context.getString(R.string.time_after))
+                )
+                if (oClockSuffix.isNotEmpty()) {
+                    assertTrue(
+                        "$style - $minute (5min): Expected no '$oClockSuffix'",
+                        !result.contains(oClockSuffix)
+                    )
+                }
+            }
         }
     }
 
     @Test
-    fun test_Zwoelftel() {
-        val cal = Calendar.getInstance()
-        val minutes = (3..7)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Zwölftel' in the output, but was: $result",
-                result.contains("Zwölftel")
+    fun test_Fractions_5min() {
+        styles.forEach { style ->
+            val context = getContext(style)
+            val cal = Calendar.getInstance()
+            val oClockSuffix = context.getString(R.string.time_suffix_o_clock)
+            
+            val testData = listOf(
+                (3..7) to R.string.fraction_twelfth,
+                (8..12) to R.string.fraction_sixth,
+                (13..17) to R.string.fraction_quarter,
+                (18..22) to R.string.fraction_third,
+                (23..27) to R.string.fraction_five_twelfths,
+                (28..32) to R.string.fraction_half,
+                (33..37) to R.string.fraction_seven_twelfths,
+                (38..42) to R.string.fraction_two_thirds,
+                (43..47) to R.string.fraction_three_quarters,
+                (48..52) to R.string.fraction_five_sixths,
+                (53..57) to R.string.fraction_eleven_twelfths
             )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
 
-    @Test
-    fun test_Sechstel() {
-        val cal = Calendar.getInstance()
-        val minutes = (8..12)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Sechstel' in the output, but was: $result",
-                result.contains("Sechstel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_Viertel() {
-        val cal = Calendar.getInstance()
-        val minutes = (13..17)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Viertel' in the output, but was: $result",
-                result.contains("Viertel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_Drittel() {
-        val cal = Calendar.getInstance()
-        val minutes = (18..22)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Drittel' in the output, but was: $result",
-                result.contains("Drittel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_FuenfZwoelftel() {
-        val cal = Calendar.getInstance()
-        val minutes = (23..27)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Fünf Zwölftel' in the output, but was: $result",
-                result.contains("Fünf Zwölftel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_Halb() {
-        val cal = Calendar.getInstance()
-        val minutes = (28..32)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Halb' in the output, but was: $result",
-                result.contains("Halb")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_SiebenZwoelftel() {
-        val cal = Calendar.getInstance()
-        val minutes = (33..37)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Sieben Zwölftel' in the output, but was: $result",
-                result.contains("Sieben Zwölftel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_ZweiDrittel() {
-        val cal = Calendar.getInstance()
-        val minutes = (38..42)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Zwei Drittel' in the output, but was: $result",
-                result.contains("Zwei Drittel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_Dreiviertel() {
-        val cal = Calendar.getInstance()
-        val minutes = (43..47)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Dreiviertel' in the output, but was: $result",
-                result.contains("Dreiviertel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_FuenfSechstel() {
-        val cal = Calendar.getInstance()
-        val minutes = (48..52)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Fünf Sechstel' in the output, but was: $result",
-                result.contains("Fünf Sechstel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
-        }
-    }
-
-    @Test
-    fun test_ElfZwoelftel() {
-        val cal = Calendar.getInstance()
-        val minutes = (53..57)
-
-        minutes.forEach {
-            cal.set(Calendar.MINUTE, it)
-            val date: Date = cal.time
-
-            val result = timeInWords(context, date, 5)
-
-            assertTrue(
-                "$it: Expected 'Elf Zwölftel' in the output, but was: $result",
-                result.contains("Elf Zwölftel")
-            )
-            assertTrue(
-                "$it: Expected no 'Uhr' in the output, but was: $result",
-                !result.contains("Uhr")
-            )
+            testData.forEach { (range, resId) ->
+                val expectedWord = context.getString(resId)
+                range.forEach { minute ->
+                    cal.set(Calendar.MINUTE, minute)
+                    val result = timeInWords(context, cal.time, 5)
+                    assertTrue(
+                        "$style - $minute: Expected '$expectedWord' in output: $result",
+                        result.contains(expectedWord)
+                    )
+                    if (oClockSuffix.isNotEmpty()) {
+                        assertTrue(
+                            "$style - $minute: Expected no '$oClockSuffix' in the output, but was: $result",
+                            !result.contains(oClockSuffix)
+                        )
+                    }
+                }
+            }
         }
     }
 }
