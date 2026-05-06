@@ -41,6 +41,7 @@ import androidx.glance.layout.fillMaxSize
 import androidx.glance.layout.fillMaxWidth
 import androidx.glance.layout.height
 import androidx.glance.state.PreferencesGlanceStateDefinition
+import androidx.glance.text.FontFamily
 import androidx.glance.text.Text
 import androidx.glance.text.TextAlign
 import androidx.glance.text.TextStyle
@@ -66,9 +67,11 @@ class MathClockWidget : GlanceAppWidget() {
         const val INITIAL_TRANSPARENCY = 40f
         const val INITIAL_GRANULARITY = 15
         const val DEFAULT_STYLE = "de"
+        const val DEFAULT_FONT = "sans_serif"
         val TransparencyKey = floatPreferencesKey("transparency")
         val GranularityKey = intPreferencesKey("granularity")
         val StyleKey = stringPreferencesKey("style")
+        val FontKey = stringPreferencesKey("font")
         const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
 
         /**
@@ -122,6 +125,14 @@ class MathClockWidget : GlanceAppWidget() {
         }
 
         /**
+         * Updates the font for all widgets and triggers an immediate redraw.
+         */
+        suspend fun updateFont(context: Context, font: String) {
+            Log.d("MathClockWidget", "updateFont called with: $font")
+            updateWidgetPreference(context, FontKey, font)
+        }
+
+        /**
          * Creates a context with a specific locale.
          */
         @SuppressLint("AppBundleLocaleChanges")
@@ -140,17 +151,18 @@ class MathClockWidget : GlanceAppWidget() {
             val transparency = glancePrefs[TransparencyKey] ?: INITIAL_TRANSPARENCY
             val granularity = glancePrefs[GranularityKey] ?: INITIAL_GRANULARITY
             val style = glancePrefs[StyleKey] ?: DEFAULT_STYLE
+            val font = glancePrefs[FontKey] ?: DEFAULT_FONT
 
-            Log.d("MathClockWidget", "Rendering with transparency: $transparency, granularity: $granularity, style: $style")
+            Log.d("MathClockWidget", "Rendering with transparency: $transparency, granularity: $granularity, style: $style, font: $font")
 
             GlanceTheme {
-                WidgetContent(context, transparency, granularity, style)
+                WidgetContent(context, transparency, granularity, style, font)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context, transparency: Float, granularity: Int, style: String) {
+    private fun WidgetContent(context: Context, transparency: Float, granularity: Int, style: String, font: String) {
         val now = Date()
         val size = LocalSize.current
         val localizedContext = getLocalizedContext(context, style)
@@ -194,12 +206,20 @@ class MathClockWidget : GlanceAppWidget() {
 
                 Spacer(modifier = GlanceModifier.height(6.dp))
 
+                val fontFamily = when (font) {
+                    "cursive" -> FontFamily.Cursive
+                    "monospace" -> FontFamily.Monospace
+                    "serif" -> FontFamily.Serif
+                    else -> FontFamily.SansSerif
+                }
+
                 Text(
                     text = wordTime,
                     style = TextStyle(
                         fontSize = calculatedFontSize,
                         color = GlanceTheme.colors.onSurface,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
+                        fontFamily = fontFamily
                     ),
                     maxLines = 2
                 )

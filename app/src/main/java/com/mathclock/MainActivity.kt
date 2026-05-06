@@ -53,6 +53,7 @@ import androidx.compose.ui.text.LinkAnnotation
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextLinkStyles
 import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.text.withLink
@@ -171,8 +172,12 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
     var granularity by remember {
         mutableIntStateOf(MathClockWidget.INITIAL_GRANULARITY)
     }
+    var currentFont by remember {
+        mutableStateOf(MathClockWidget.DEFAULT_FONT)
+    }
 
-    var expanded by remember { mutableStateOf(false) }
+    var styleExpanded by remember { mutableStateOf(false) }
+    var fontExpanded by remember { mutableStateOf(false) }
 
     // Load initial values from Glance state
     LaunchedEffect(Unit) {
@@ -287,7 +292,8 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
         ) {
             Text(
                 text = "Stil:",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.width(60.dp)
             )
 
             Spacer(modifier = Modifier.width(16.dp))
@@ -297,15 +303,15 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
             val selectedLabel = styleLabels[styleOptions.indexOf(currentStyle).coerceAtLeast(0)]
 
             ExposedDropdownMenuBox(
-                expanded = expanded,
-                onExpandedChange = { expanded = !expanded },
-                modifier = Modifier.width(250.dp)
+                expanded = styleExpanded,
+                onExpandedChange = { styleExpanded = !styleExpanded },
+                modifier = Modifier.width(200.dp)
             ) {
                 TextField(
                     value = selectedLabel,
                     onValueChange = {},
                     readOnly = true,
-                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = styleExpanded) },
                     colors = ExposedDropdownMenuDefaults.textFieldColors(),
                     textStyle = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier
@@ -317,8 +323,8 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
                 )
 
                 ExposedDropdownMenu(
-                    expanded = expanded,
-                    onDismissRequest = { expanded = false }
+                    expanded = styleExpanded,
+                    onDismissRequest = { styleExpanded = false }
                 ) {
                     styleOptions.forEachIndexed { index, option ->
                         DropdownMenuItem(
@@ -336,7 +342,74 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
                                         option
                                     )
                                 }
-                                expanded = false
+                                styleExpanded = false
+                            }
+                        )
+                    }
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            Text(
+                text = "Schrift:",
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.width(60.dp)
+            )
+
+            Spacer(modifier = Modifier.width(16.dp))
+
+            val fontOptions = listOf("sans_serif", "serif", "cursive", "monospace")
+            val fontLabels = listOf("Grotesk", "Antiqua", "Kursiv", "Festbreite")
+            val selectedFontLabel = fontLabels[fontOptions.indexOf(currentFont).coerceAtLeast(0)]
+
+            ExposedDropdownMenuBox(
+                expanded = fontExpanded,
+                onExpandedChange = { fontExpanded = !fontExpanded },
+                modifier = Modifier.width(200.dp)
+            ) {
+                TextField(
+                    value = selectedFontLabel,
+                    onValueChange = {},
+                    readOnly = true,
+                    trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = fontExpanded) },
+                    colors = ExposedDropdownMenuDefaults.textFieldColors(),
+                    textStyle = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .menuAnchor(
+                            ExposedDropdownMenuAnchorType.PrimaryNotEditable,
+                            true
+                        )
+                        .height(48.dp)
+                )
+
+                ExposedDropdownMenu(
+                    expanded = fontExpanded,
+                    onDismissRequest = { fontExpanded = false }
+                ) {
+                    fontOptions.forEachIndexed { index, option ->
+                        DropdownMenuItem(
+                            text = {
+                                Text(
+                                    text = fontLabels[index],
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            onClick = {
+                                currentFont = option
+                                MainScope().launch {
+                                    MathClockWidget.updateFont(
+                                        current.applicationContext,
+                                        option
+                                    )
+                                }
+                                fontExpanded = false
                             }
                         )
                     }
@@ -357,7 +430,13 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
             Text(
                 text = timeInWords(localizedContext, currentDate, granularity),
                 style = MaterialTheme.typography.headlineSmall,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
+                fontFamily = when (currentFont) {
+                    "serif" -> FontFamily.Serif
+                    "monospace" -> FontFamily.Monospace
+                    "cursive" -> FontFamily.Cursive
+                    else -> FontFamily.SansSerif
+                }
             )
         }
     }
