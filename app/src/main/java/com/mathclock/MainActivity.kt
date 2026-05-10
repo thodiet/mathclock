@@ -85,9 +85,14 @@ class MainActivity : ComponentActivity() {
             MathClockTheme {
                 var currentScreen by remember { mutableStateOf(Screen.Clock) }
                 var style by remember { mutableStateOf(MathClockWidget.DEFAULT_STYLE) }
+                var font by remember { mutableStateOf(MathClockWidget.DEFAULT_FONT) }
+                var transparency by remember { mutableFloatStateOf(MathClockWidget.INITIAL_TRANSPARENCY) }
+                var granularity by remember { mutableIntStateOf(MathClockWidget.INITIAL_GRANULARITY) }
+                var isLoading by remember { mutableStateOf(true) }
+                
                 val current = LocalContext.current
 
-                // Load initial style from Glance state
+                // Load all state from Glance state in one go
                 LaunchedEffect(Unit) {
                     val manager = GlanceAppWidgetManager(current)
                     val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
@@ -96,9 +101,12 @@ class MainActivity : ComponentActivity() {
                             current,
                             glanceIds.first()
                         )
-                        style =
-                            state[MathClockWidget.StyleKey] ?: MathClockWidget.DEFAULT_STYLE
+                        style = state[MathClockWidget.StyleKey] ?: MathClockWidget.DEFAULT_STYLE
+                        font = state[MathClockWidget.FontKey] ?: MathClockWidget.DEFAULT_FONT
+                        transparency = state[MathClockWidget.TransparencyKey] ?: MathClockWidget.INITIAL_TRANSPARENCY
+                        granularity = state[MathClockWidget.GranularityKey] ?: MathClockWidget.INITIAL_GRANULARITY
                     }
+                    isLoading = false
                 }
 
                 val localizedContext = MathClockWidget.getLocalizedContext(current, style)
@@ -110,36 +118,38 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        TopAppBar(
-                            title = {
-                                Text(
-                                    when (currentScreen) {
-                                        Screen.Clock -> localizedContext.getString(R.string.settings_title)
-                                        Screen.Info -> localizedContext.getString(R.string.info_title)
+                        if (!isLoading) {
+                            TopAppBar(
+                                title = {
+                                    Text(
+                                        when (currentScreen) {
+                                            Screen.Clock -> localizedContext.getString(R.string.settings_title)
+                                            Screen.Info -> localizedContext.getString(R.string.info_title)
+                                        }
+                                    )
+                                },
+                                navigationIcon = {
+                                    if (currentScreen != Screen.Clock) {
+                                        IconButton(onClick = { currentScreen = Screen.Clock }) {
+                                            Icon(
+                                                Icons.AutoMirrored.Filled.ArrowBack,
+                                                contentDescription = localizedContext.getString(R.string.back_content_description)
+                                            )
+                                        }
                                     }
-                                )
-                            },
-                            navigationIcon = {
-                                if (currentScreen != Screen.Clock) {
-                                    IconButton(onClick = { currentScreen = Screen.Clock }) {
-                                        Icon(
-                                            Icons.AutoMirrored.Filled.ArrowBack,
-                                            contentDescription = localizedContext.getString(R.string.back_content_description)
-                                        )
+                                },
+                                actions = {
+                                    if (currentScreen == Screen.Clock) {
+                                        IconButton(onClick = { currentScreen = Screen.Info }) {
+                                            Icon(
+                                                Icons.Default.Info,
+                                                contentDescription = localizedContext.getString(R.string.info_title)
+                                            )
+                                        }
                                     }
                                 }
-                            },
-                            actions = {
-                                if (currentScreen == Screen.Clock) {
-                                    IconButton(onClick = { currentScreen = Screen.Info }) {
-                                        Icon(
-                                            Icons.Default.Info,
-                                            contentDescription = localizedContext.getString(R.string.info_title)
-                                        )
-                                    }
-                                }
-                            }
-                        )
+                            )
+                        }
                     }
                 ) { innerPadding ->
                     Box(
@@ -148,9 +158,21 @@ class MainActivity : ComponentActivity() {
                             .padding(innerPadding),
                         contentAlignment = Alignment.Center
                     ) {
-                        when (currentScreen) {
-                            Screen.Clock -> DigitalClock(style) { style = it }
-                            Screen.Info -> InfoScreen(style)
+                        if (!isLoading) {
+                            when (currentScreen) {
+                                Screen.Clock -> DigitalClock(
+                                    currentStyle = style,
+                                    onStyleChange = { style = it },
+                                    currentFont = font,
+                                    onFontChange = { font = it },
+                                    currentTransparency = transparency,
+                                    onTransparencyChange = { transparency = it },
+                                    currentGranularity = granularity,
+                                    onGranularityChange = { granularity = it }
+                                )
+
+                                Screen.Info -> InfoScreen(style)
+                            }
                         }
                     }
                 }
@@ -161,39 +183,21 @@ class MainActivity : ComponentActivity() {
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
+fun DigitalClock(
+    currentStyle: String,
+    onStyleChange: (String) -> Unit,
+    currentFont: String,
+    onFontChange: (String) -> Unit,
+    currentTransparency: Float,
+    onTransparencyChange: (Float) -> Unit,
+    currentGranularity: Int,
+    onGranularityChange: (Int) -> Unit
+) {
     val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
 
-    // Initial value, will be updated by LaunchedEffect
-    var transparency by remember {
-        mutableFloatStateOf(MathClockWidget.INITIAL_TRANSPARENCY)
-    }
-    var granularity by remember {
-        mutableIntStateOf(MathClockWidget.INITIAL_GRANULARITY)
-    }
-    var currentFont by remember {
-        mutableStateOf(MathClockWidget.DEFAULT_FONT)
-    }
-
     var styleExpanded by remember { mutableStateOf(false) }
     var fontExpanded by remember { mutableStateOf(false) }
-
-    // Load initial values from Glance state
-    LaunchedEffect(Unit) {
-        val manager = GlanceAppWidgetManager(current)
-        val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
-        if (glanceIds.isNotEmpty()) {
-            val state = MathClockWidget().getAppWidgetState<Preferences>(
-                current,
-                glanceIds.first()
-            )
-            transparency =
-                state[MathClockWidget.TransparencyKey] ?: MathClockWidget.INITIAL_TRANSPARENCY
-            granularity =
-                state[MathClockWidget.GranularityKey] ?: MathClockWidget.INITIAL_GRANULARITY
-        }
-    }
 
     val localizedContext = MathClockWidget.getLocalizedContext(current, currentStyle)
 
@@ -213,18 +217,18 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
         Text(
             text = localizedContext.getString(
                 R.string.transparency_label,
-                transparency.roundToInt()
+                currentTransparency.roundToInt()
             ),
             style = MaterialTheme.typography.bodyLarge
         )
         Slider(
-            value = transparency,
+            value = currentTransparency,
             onValueChange = {
-                transparency = it
+                onTransparencyChange(it)
             },
             onValueChangeFinished = {
                 MainScope().launch {
-                    MathClockWidget.updateTransparency(current.applicationContext, transparency)
+                    MathClockWidget.updateTransparency(current.applicationContext, currentTransparency)
                 }
             },
             valueRange = 0f..100f
@@ -255,13 +259,13 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
                 Row(
                     Modifier
                         .selectable(
-                            selected = (option == granularity),
+                            selected = (option == currentGranularity),
                             onClick = {
-                                granularity = option
+                                onGranularityChange(option)
                                 MainScope().launch {
                                     MathClockWidget.updateGranularity(
                                         current.applicationContext,
-                                        granularity
+                                        option
                                     )
                                 }
                             },
@@ -271,7 +275,7 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     RadioButton(
-                        selected = (option == granularity),
+                        selected = (option == currentGranularity),
                         onClick = null // null because of selectable modifier
                     )
                     Text(
@@ -402,7 +406,7 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
                                 )
                             },
                             onClick = {
-                                currentFont = option
+                                onFontChange(option)
                                 MainScope().launch {
                                     MathClockWidget.updateFont(
                                         current.applicationContext,
@@ -428,7 +432,7 @@ fun DigitalClock(currentStyle: String, onStyleChange: (String) -> Unit) {
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
-                text = timeInWords(localizedContext, currentDate, granularity),
+                text = timeInWords(localizedContext, currentDate, currentGranularity),
                 style = MaterialTheme.typography.headlineSmall,
                 textAlign = TextAlign.Center,
                 fontFamily = when (currentFont) {
@@ -503,7 +507,16 @@ fun InfoScreen(style: String) {
 @Composable
 fun DigitalClockPreview() {
     MathClockTheme {
-        DigitalClock("de") {}
+        DigitalClock(
+            currentStyle = "de",
+            onStyleChange = {},
+            currentFont = "sans_serif",
+            onFontChange = {},
+            currentTransparency = 40f,
+            onTransparencyChange = {},
+            currentGranularity = 15,
+            onGranularityChange = {}
+        )
     }
 }
 
