@@ -78,6 +78,19 @@ class MathClockWidget : GlanceAppWidget() {
          * Generic helper to update widget preferences.
          */
         private suspend fun <T> updateWidgetPreference(context: Context, key: Preferences.Key<T>, value: T) {
+            // 1. Update SharedPreferences for fast synchronous access in MainActivity
+            val sharedPrefs = context.getSharedPreferences("MathClockSettings", Context.MODE_PRIVATE)
+            sharedPrefs.edit().apply {
+                when (value) {
+                    is String -> putString(key.name, value)
+                    is Float -> putFloat(key.name, value)
+                    is Int -> putInt(key.name, value)
+                    is Boolean -> putBoolean(key.name, value)
+                }
+                apply()
+            }
+
+            // 2. Update Glance state for the widget
             val manager = GlanceAppWidgetManager(context)
             val glanceIds = manager.getGlanceIds(MathClockWidget::class.java)
 
