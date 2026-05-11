@@ -12,6 +12,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.core.Preferences
@@ -68,10 +69,14 @@ class MathClockWidget : GlanceAppWidget() {
         const val INITIAL_GRANULARITY = 15
         const val DEFAULT_STYLE = "de"
         const val DEFAULT_FONT = "sans_serif"
+        const val DEFAULT_SHOW_DIGITAL = true
+        const val DEFAULT_SHOW_WORDS = true
         val TransparencyKey = floatPreferencesKey("transparency")
         val GranularityKey = intPreferencesKey("granularity")
         val StyleKey = stringPreferencesKey("style")
         val FontKey = stringPreferencesKey("font")
+        val ShowDigitalKey = booleanPreferencesKey("show_digital")
+        val ShowWordsKey = booleanPreferencesKey("show_words")
         const val ACTION_UPDATE = "com.mathclock.ACTION_WIDGET_UPDATE"
 
         /**
@@ -146,6 +151,22 @@ class MathClockWidget : GlanceAppWidget() {
         }
 
         /**
+         * Updates the visibility of the digital clock and triggers an immediate redraw.
+         */
+        suspend fun updateShowDigital(context: Context, show: Boolean) {
+            Log.d("MathClockWidget", "updateShowDigital called with: $show")
+            updateWidgetPreference(context, ShowDigitalKey, show)
+        }
+
+        /**
+         * Updates the visibility of the word clock and triggers an immediate redraw.
+         */
+        suspend fun updateShowWords(context: Context, show: Boolean) {
+            Log.d("MathClockWidget", "updateShowWords called with: $show")
+            updateWidgetPreference(context, ShowWordsKey, show)
+        }
+
+        /**
          * Creates a context with a specific locale.
          */
         @SuppressLint("AppBundleLocaleChanges")
@@ -165,17 +186,27 @@ class MathClockWidget : GlanceAppWidget() {
             val granularity = glancePrefs[GranularityKey] ?: INITIAL_GRANULARITY
             val style = glancePrefs[StyleKey] ?: DEFAULT_STYLE
             val font = glancePrefs[FontKey] ?: DEFAULT_FONT
+            val showDigital = glancePrefs[ShowDigitalKey] ?: DEFAULT_SHOW_DIGITAL
+            val showWords = glancePrefs[ShowWordsKey] ?: DEFAULT_SHOW_WORDS
 
-            Log.d("MathClockWidget", "Rendering with transparency: $transparency, granularity: $granularity, style: $style, font: $font")
+            Log.d("MathClockWidget", "Rendering with transparency: $transparency, granularity: $granularity, style: $style, font: $font, showDigital: $showDigital, showWords: $showWords")
 
             GlanceTheme {
-                WidgetContent(context, transparency, granularity, style, font)
+                WidgetContent(context, transparency, granularity, style, font, showDigital, showWords)
             }
         }
     }
 
     @Composable
-    private fun WidgetContent(context: Context, transparency: Float, granularity: Int, style: String, font: String) {
+    private fun WidgetContent(
+        context: Context,
+        transparency: Float,
+        granularity: Int,
+        style: String,
+        font: String,
+        showDigital: Boolean,
+        showWords: Boolean
+    ) {
         val now = Date()
         val size = LocalSize.current
         val localizedContext = getLocalizedContext(context, style)
@@ -210,32 +241,38 @@ class MathClockWidget : GlanceAppWidget() {
             Column(
                 horizontalAlignment = Alignment.Horizontal.CenterHorizontally
             ) {
-                // System-managed TextClock (Uses ?android:attr/textColorPrimary in XML)
-                AndroidRemoteViews(
-                    remoteViews = RemoteViews(context.packageName, R.layout.widget_clock_layout),
-                    modifier = GlanceModifier
-                        .fillMaxWidth()
-                )
-
-                Spacer(modifier = GlanceModifier.height(6.dp))
-
-                val fontFamily = when (font) {
-                    "cursive" -> FontFamily.Cursive
-                    "monospace" -> FontFamily.Monospace
-                    "serif" -> FontFamily.Serif
-                    else -> FontFamily.SansSerif
+                if (showDigital) {
+                    // System-managed TextClock (Uses ?android:attr/textColorPrimary in XML)
+                    AndroidRemoteViews(
+                        remoteViews = RemoteViews(context.packageName, R.layout.widget_clock_layout),
+                        modifier = GlanceModifier
+                            .fillMaxWidth()
+                    )
                 }
 
-                Text(
-                    text = wordTime,
-                    style = TextStyle(
-                        fontSize = calculatedFontSize,
-                        color = GlanceTheme.colors.onSurface,
-                        textAlign = TextAlign.Center,
-                        fontFamily = fontFamily
-                    ),
-                    maxLines = 2
-                )
+                if (showDigital && showWords) {
+                    Spacer(modifier = GlanceModifier.height(6.dp))
+                }
+
+                if (showWords) {
+                    val fontFamily = when (font) {
+                        "cursive" -> FontFamily.Cursive
+                        "monospace" -> FontFamily.Monospace
+                        "serif" -> FontFamily.Serif
+                        else -> FontFamily.SansSerif
+                    }
+
+                    Text(
+                        text = wordTime,
+                        style = TextStyle(
+                            fontSize = calculatedFontSize,
+                            color = GlanceTheme.colors.onSurface,
+                            textAlign = TextAlign.Center,
+                            fontFamily = fontFamily
+                        ),
+                        maxLines = 2
+                    )
+                }
             }
         }
     }

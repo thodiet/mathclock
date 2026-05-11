@@ -1,6 +1,5 @@
 package com.mathclock
 
-import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
@@ -23,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuAnchorType
@@ -90,6 +90,8 @@ class MainActivity : ComponentActivity() {
         val initialFont = sharedPrefs.getString(MathClockWidget.FontKey.name, MathClockWidget.DEFAULT_FONT) ?: MathClockWidget.DEFAULT_FONT
         val initialTransparency = sharedPrefs.getFloat(MathClockWidget.TransparencyKey.name, MathClockWidget.INITIAL_TRANSPARENCY)
         val initialGranularity = sharedPrefs.getInt(MathClockWidget.GranularityKey.name, MathClockWidget.INITIAL_GRANULARITY)
+        val initialShowDigital = sharedPrefs.getBoolean(MathClockWidget.ShowDigitalKey.name, MathClockWidget.DEFAULT_SHOW_DIGITAL)
+        val initialShowWords = sharedPrefs.getBoolean(MathClockWidget.ShowWordsKey.name, MathClockWidget.DEFAULT_SHOW_WORDS)
 
         setContent {
             MathClockTheme {
@@ -98,6 +100,8 @@ class MainActivity : ComponentActivity() {
                 var font by rememberSaveable { mutableStateOf(initialFont) }
                 var transparency by rememberSaveable { mutableFloatStateOf(initialTransparency) }
                 var granularity by rememberSaveable { mutableIntStateOf(initialGranularity) }
+                var showDigital by rememberSaveable { mutableStateOf(initialShowDigital) }
+                var showWords by rememberSaveable { mutableStateOf(initialShowWords) }
 
                 val current = LocalContext.current
 
@@ -122,6 +126,12 @@ class MainActivity : ComponentActivity() {
                         
                         val newGranularity = state[MathClockWidget.GranularityKey] ?: MathClockWidget.INITIAL_GRANULARITY
                         if (granularity != newGranularity) granularity = newGranularity
+
+                        val newShowDigital = state[MathClockWidget.ShowDigitalKey] ?: MathClockWidget.DEFAULT_SHOW_DIGITAL
+                        if (showDigital != newShowDigital) showDigital = newShowDigital
+
+                        val newShowWords = state[MathClockWidget.ShowWordsKey] ?: MathClockWidget.DEFAULT_SHOW_WORDS
+                        if (showWords != newShowWords) showWords = newShowWords
                     }
                 }
 
@@ -181,7 +191,11 @@ class MainActivity : ComponentActivity() {
                                 currentTransparency = transparency,
                                 onTransparencyChange = { transparency = it },
                                 currentGranularity = granularity,
-                                onGranularityChange = { granularity = it }
+                                onGranularityChange = { granularity = it },
+                                currentShowDigital = showDigital,
+                                onShowDigitalChange = { showDigital = it },
+                                currentShowWords = showWords,
+                                onShowWordsChange = { showWords = it }
                             )
 
                             Screen.Info -> InfoScreen(style)
@@ -203,7 +217,11 @@ fun DigitalClock(
     currentTransparency: Float,
     onTransparencyChange: (Float) -> Unit,
     currentGranularity: Int,
-    onGranularityChange: (Int) -> Unit
+    onGranularityChange: (Int) -> Unit,
+    currentShowDigital: Boolean,
+    onShowDigitalChange: (Boolean) -> Unit,
+    currentShowWords: Boolean,
+    onShowWordsChange: (Boolean) -> Unit
 ) {
     val current = LocalContext.current
     var currentDate by remember { mutableStateOf(Date()) }
@@ -299,7 +317,45 @@ fun DigitalClock(
             }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Row(
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Checkbox(
+                checked = currentShowDigital,
+                onCheckedChange = {
+                    onShowDigitalChange(it)
+                    MainScope().launch {
+                        MathClockWidget.updateShowDigital(current.applicationContext, it)
+                    }
+                }
+            )
+            Text(
+                text = "Digitaluhr anzeigen",
+                style = MaterialTheme.typography.bodyLarge
+            )
+            
+            Spacer(modifier = Modifier.width(24.dp))
+            
+            Checkbox(
+                checked = currentShowWords,
+                onCheckedChange = {
+                    onShowWordsChange(it)
+                    MainScope().launch {
+                        MathClockWidget.updateShowWords(current.applicationContext, it)
+                    }
+                }
+            )
+            Text(
+                text = "Wort-Uhr anzeigen",
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -527,7 +583,11 @@ fun DigitalClockPreview() {
             currentTransparency = 40f,
             onTransparencyChange = {},
             currentGranularity = 15,
-            onGranularityChange = {}
+            onGranularityChange = {},
+            currentShowDigital = true,
+            onShowDigitalChange = {},
+            currentShowWords = true,
+            onShowWordsChange = {}
         )
     }
 }
