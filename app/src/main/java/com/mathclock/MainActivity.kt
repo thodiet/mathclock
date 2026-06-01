@@ -317,44 +317,6 @@ fun DigitalClock(
             }
         }
 
-        Row(
-            Modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Checkbox(
-                checked = currentShowDigital,
-                onCheckedChange = {
-                    onShowDigitalChange(it)
-                    MainScope().launch {
-                        MathClockWidget.updateShowDigital(current.applicationContext, it)
-                    }
-                }
-            )
-            Text(
-                text = "Digitaluhr anzeigen",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            
-            Spacer(modifier = Modifier.width(24.dp))
-            
-            Checkbox(
-                checked = currentShowWords,
-                onCheckedChange = {
-                    onShowWordsChange(it)
-                    MainScope().launch {
-                        MathClockWidget.updateShowWords(current.applicationContext, it)
-                    }
-                }
-            )
-            Text(
-                text = "Wort-Uhr anzeigen",
-                style = MaterialTheme.typography.bodyLarge
-            )
-        }
-
         Spacer(modifier = Modifier.height(16.dp))
 
         Row(
@@ -486,6 +448,52 @@ fun DigitalClock(
                         )
                     }
                 }
+            }
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(30.dp)
+            ) {
+                Checkbox(
+                    checked = currentShowDigital,
+                    onCheckedChange = {
+                        onShowDigitalChange(it)
+                        MainScope().launch {
+                            MathClockWidget.updateShowDigital(current.applicationContext, it)
+                        }
+                    }
+                )
+                Text(
+                    text = localizedContext.getString(R.string.display_digital),
+                    style = MaterialTheme.typography.bodyLarge
+                )
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.height(30.dp)
+            ) {
+                Checkbox(
+                    checked = currentShowWords,
+                    onCheckedChange = {
+                        onShowWordsChange(it)
+                        MainScope().launch {
+                            MathClockWidget.updateShowWords(current.applicationContext, it)
+                        }
+                    }
+                )
+                Text(
+                    text = localizedContext.getString(R.string.display_words),
+                    style = MaterialTheme.typography.bodyLarge
+                )
             }
         }
 

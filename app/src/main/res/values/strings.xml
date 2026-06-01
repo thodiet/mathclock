@@ -7,9 +7,11 @@
     <string name="granularity_label">Anzeige-Granularität:</string>
     <string name="granularity_15">15 Min (Viertel)</string>
     <string name="granularity_5">5 Min (Zwölftel)</string>
-    <string name="welcome_title">Willkommen zur Math Clock</string>
+    <string name="display_digital">Digital-Anzeige</string>
+    <string name="display_words">Text-Anzeige</string>
 
     <!-- Info Screen parts -->
+    <string name="welcome_title">Willkommen zur Math Clock</string>
     <string name="info_jesus_christ">Jesus Christus spricht:\nIch bin der Weg! Ich bin die Wahrheit und das Leben! Zum Vater kommt man nur durch mich.\n</string>
     <string name="info_john_14_6">Joh. 14,6</string>
     <string name="info_david_pray">\n\nDavid betet:\nMeine Zeit steht in deinen Händen.\n</string>
