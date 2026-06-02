@@ -22,6 +22,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Info
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,6 +36,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Slider
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
@@ -230,6 +232,23 @@ fun DigitalClock(
     var fontExpanded by remember { mutableStateOf(false) }
 
     val localizedContext = MathClockWidget.getLocalizedContext(current, currentStyle)
+
+    var showDigitalWarning by remember { mutableStateOf(false) }
+
+    if (showDigitalWarning) {
+        AlertDialog(
+            onDismissRequest = { showDigitalWarning = false },
+            title = { Text(text = localizedContext.getString(R.string.digital_display_warning_title)) },
+            text = { Text(text = localizedContext.getString(R.string.digital_display_warning_message)) },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDigitalWarning = false
+                }) {
+                    Text(localizedContext.getString(R.string.ok))
+                }
+            }
+        )
+    }
 
     // Update the time every second
     LaunchedEffect(Unit) {
@@ -460,11 +479,14 @@ fun DigitalClock(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.height(30.dp)
+                modifier = Modifier.height(32.dp)
             ) {
                 Checkbox(
                     checked = currentShowDigital,
                     onCheckedChange = {
+                        if (!it) {
+                            showDigitalWarning = true
+                        }
                         onShowDigitalChange(it)
                         MainScope().launch {
                             MathClockWidget.updateShowDigital(current.applicationContext, it)
@@ -479,7 +501,7 @@ fun DigitalClock(
 
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.height(30.dp)
+                modifier = Modifier.height(32.dp)
             ) {
                 Checkbox(
                     checked = currentShowWords,
