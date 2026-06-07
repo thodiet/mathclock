@@ -64,6 +64,7 @@ import androidx.compose.ui.text.withLink
 import androidx.compose.ui.tooling.preview.Preview
 import java.util.Calendar
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.appwidget.GlanceAppWidgetManager
 import androidx.glance.appwidget.state.getAppWidgetState
@@ -75,6 +76,7 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.seconds
 
 enum class Screen {
     Clock, Info
@@ -254,7 +256,7 @@ fun DigitalClock(
     LaunchedEffect(Unit) {
         while (true) {
             currentDate = Date()
-            delay(1000L)
+            delay(1.seconds)
         }
     }
     Column(
@@ -531,7 +533,11 @@ fun DigitalClock(
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = timeInWords(localizedContext, currentDate, currentGranularity),
-                style = MaterialTheme.typography.headlineSmall,
+                style = if (currentFont == "cursive") {
+                    MaterialTheme.typography.headlineMedium.copy(fontSize = 32.sp)
+                } else {
+                    MaterialTheme.typography.headlineSmall
+                },
                 textAlign = TextAlign.Center,
                 fontFamily = when (currentFont) {
                     "serif" -> FontFamily.Serif

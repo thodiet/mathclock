@@ -14,7 +14,7 @@
     <string name="digital_display_warning_message">Du kannst die Digitaluhr abschalten, aber sei gewarnt, dass es Fälle gibt, in denen die textuelle Uhrzeit im Widget nicht (ganz) aktuell ist. Leider lässt sich das aufgrund der speziellen Beschränkungen, denen Widgets unterliegen, nicht vollständig vermeiden. Die App selbst ist immer aktuell.</string>
     <string name="ok">OK</string>
 
-    <!-- Info Screen parts -->
+    <!-- Information Screen parts -->
     <string name="welcome_title">Willkommen zur Math Clock</string>
     <string name="info_jesus_christ">Jesus Christus spricht:\nIch bin der Weg! Ich bin die Wahrheit und das Leben! Zum Vater kommt man nur durch mich.\n</string>
     <string name="info_john_14_6">Joh. 14,6</string>

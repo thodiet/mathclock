@@ -224,12 +224,13 @@ class MathClockWidget : GlanceAppWidget() {
         )
 
         // Dynamic font size based on widget width (size.width is in dp)
-        val calculatedFontSize = when {
+        val baseFontSize = when {
             size.width < 150.dp -> 10.sp
             size.width < 250.dp -> 14.sp
             size.width < 350.dp -> 18.sp
             else -> 22.sp
         }
+        val calculatedFontSize = if (font == "cursive") baseFontSize * 1.3f else baseFontSize
 
         Box(
             modifier = GlanceModifier
