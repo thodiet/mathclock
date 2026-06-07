@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
@@ -262,6 +263,7 @@ fun DigitalClock(
     Column(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(rememberScrollState())
             .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -282,7 +284,8 @@ fun DigitalClock(
                     MathClockWidget.updateTransparency(current.applicationContext, currentTransparency)
                 }
             },
-            valueRange = 0f..100f
+            valueRange = 0f..100f,
+            modifier = Modifier.widthIn(max = 300.dp)
         )
 
         Spacer(modifier = Modifier.height(16.dp))
@@ -475,9 +478,7 @@ fun DigitalClock(
         Spacer(modifier = Modifier.height(16.dp))
 
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 16.dp)
+            horizontalAlignment = Alignment.Start
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
@@ -522,7 +523,7 @@ fun DigitalClock(
         }
 
         Column(
-            modifier = Modifier.weight(1f),
+            modifier = Modifier.padding(vertical = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
