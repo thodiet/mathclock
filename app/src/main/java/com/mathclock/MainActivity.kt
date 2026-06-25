@@ -1,3 +1,20 @@
+/*
+ * Copyright (C) 2026 thodiet <thodiet@protonmail.com>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+
 package com.mathclock
 
 import android.os.Bundle
@@ -560,11 +577,11 @@ private fun formatTime(date: Date, locale: Locale): String {
 fun InfoScreen(style: String) {
     val current = LocalContext.current
     val localizedContext = MathClockWidget.getLocalizedContext(current, style)
-    val infoText = buildAnnotatedString {
+    val bibleText = buildAnnotatedString {
         append(localizedContext.getString(R.string.info_jesus_christ))
         withLink(
             LinkAnnotation.Url(
-                url = "https://www.bibleserver.com/Ne%C3%9C/Johannes14%2C6",
+                url = "https://www.bibleserver.com/LUT/Johannes14%2C6",
                 styles = TextLinkStyles(
                     style = SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
@@ -585,6 +602,9 @@ fun InfoScreen(style: String) {
                 )
             )
         ) { append(localizedContext.getString(R.string.info_psalm_31_16)) }
+    }
+
+    val remainingText = buildAnnotatedString {
         append(localizedContext.getString(R.string.info_explanation))
         append(localizedContext.getString(R.string.info_honor_to_jesus))
     }
@@ -602,7 +622,19 @@ fun InfoScreen(style: String) {
         )
         Spacer(modifier = Modifier.height(16.dp))
         Text(
-            text = infoText,
+            text = bibleText,
+            style = MaterialTheme.typography.bodyLarge
+        )
+        Text(
+            text = localizedContext.getString(R.string.info_copyright),
+            style = MaterialTheme.typography.labelSmall.copy(
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            ),
+            modifier = Modifier.fillMaxWidth(),
+            textAlign = TextAlign.End
+        )
+        Text(
+            text = remainingText,
             style = MaterialTheme.typography.bodyLarge
         )
     }

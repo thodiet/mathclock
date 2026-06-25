@@ -11,8 +11,8 @@ android {
         applicationId = "com.mathclock"
         minSdk = 24
         targetSdk = 35
-        versionCode = 1
-        versionName = "1.6.1 (2)"
+        versionCode = 3
+        versionName = "1.6.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
