@@ -1,0 +1,6 @@
+Mittels dieser App kann ein Widget konfiguriert werden, das eine Digitaluhr anzeigt und darunter die Uhrzeit in Worten.
+Die Wortuhr beruht auf Viertelstundenangaben, wie sie vor allem im Süden Deutschlands gebräuchlich sind.
+Zusätzlich zur Viertelstundenbasis gibt es auch eine 5-Minuten-Basis.
+Die Wortuhr kann in Stil und Schriftart angepasst werden.
+Das Widget lässt sich beliebig transparent einstellen.
+Außerdem sind sowohl die Digitaluhr als auch die Wortuhr abschaltbar.
