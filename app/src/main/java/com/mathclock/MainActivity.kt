@@ -581,7 +581,7 @@ fun InfoScreen(style: String) {
         append(localizedContext.getString(R.string.info_jesus_christ))
         withLink(
             LinkAnnotation.Url(
-                url = "https://www.bibleserver.com/LUT/Johannes14%2C6",
+                url = "https://www.bibleserver.com/Ne%C3%9C/Johannes14%2C6",
                 styles = TextLinkStyles(
                     style = SpanStyle(
                         color = MaterialTheme.colorScheme.primary,
