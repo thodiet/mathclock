@@ -1,0 +1,4 @@
+1.6.1
+- fix launch of widget on some Android 15 phones
+- reduce targetSdk to 35
+- increase JavaVersion to VERSION_17

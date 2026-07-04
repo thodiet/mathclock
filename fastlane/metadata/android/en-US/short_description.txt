@@ -1,0 +1,1 @@
+Widget, which shows the time in German words based on fractions
