@@ -1,0 +1,5 @@
+1.6.1 (8)
+- add changelog file 8.txt
+- increase `versionCode` to 8
+- disable `dependenciesInfo` inclusion in APK and Bundle
+- suppress `GradleDependency` in dependencies block
